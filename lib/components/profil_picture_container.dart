@@ -9,12 +9,13 @@ class ProfilPictureContainer extends StatelessWidget {
     return M3Container.sunny(
       height: 200,
       width: 200,
+      color: Colors.black,
       child: Center(
         child: Container(
           height: 150,
           width: 150,
           decoration: BoxDecoration(
-            color: const Color.,
+            color: const Color.fromARGB(255, 91, 41, 37),
             borderRadius: BorderRadius.circular(75),
           ),
         ),
