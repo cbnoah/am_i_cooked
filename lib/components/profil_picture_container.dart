@@ -9,14 +9,31 @@ class ProfilPictureContainer extends StatelessWidget {
     return M3Container.sunny(
       height: 200,
       width: 200,
-      color: Colors.black,
+      color: Color(0xFF4F378A),
       child: Center(
         child: Container(
           height: 150,
           width: 150,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 91, 41, 37),
+            image: const DecorationImage(
+              image: AssetImage('assets/images/avatar_image.jpg'),
+              fit: BoxFit.cover,
+            ),
             borderRadius: BorderRadius.circular(75),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white,
+                spreadRadius: 2,
+                blurRadius: 20,
+                offset: const Offset(0, 0),
+              ),
+            ],
+          ),
+          alignment: Alignment.bottomRight,
+          child: FloatingActionButton(onPressed: () {},
+          shape: CircleBorder(),
+          backgroundColor: Color(0xFF4F378A),
+          child: Icon(Icons.edit_outlined, color: Colors.white, size: 20,),
           ),
         ),
       ),
