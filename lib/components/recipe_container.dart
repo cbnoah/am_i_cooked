@@ -5,7 +5,12 @@ class RecipeContainer extends StatelessWidget {
   final bool isBookmarked;
   final bool showBookmarkIcon;
 
-  const RecipeContainer({super.key, required this.path, required this.isBookmarked, required this.showBookmarkIcon});
+  const RecipeContainer({
+    super.key,
+    required this.path,
+    required this.isBookmarked,
+    required this.showBookmarkIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +18,9 @@ class RecipeContainer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           image: DecorationImage(image: NetworkImage(path), fit: BoxFit.cover),
-          borderRadius: BorderRadius.all(Radius.circular(30))
+          borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
+        clipBehavior: Clip.antiAlias,
         width: 300,
         height: 200,
         child: Center(
@@ -33,11 +39,21 @@ class RecipeContainer extends StatelessWidget {
                 ),
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  padding: const EdgeInsets.only(left: 15.0, right: 4.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Poulet roti", style: TextStyle(fontFamily: "bbh_sans_hegarty", fontSize: 22, overflow: TextOverflow.ellipsis),),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          "Poulet roti",
+                          style: TextStyle(
+                            fontFamily: "bbh_sans_hegarty",
+                            fontSize: 22,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
                       GestureDetector(
                         child: Container(
                           width: 40,
@@ -49,7 +65,10 @@ class RecipeContainer extends StatelessWidget {
                             ),
                             color: Color(0xffeaddff),
                           ),
-                          child: Icon(Icons.bookmark_border, color: Color(0xFF4a4459),),
+                          child: Icon(
+                            Icons.bookmark_border,
+                            color: Color(0xFF4a4459),
+                          ),
                         ),
                       ),
                     ],
