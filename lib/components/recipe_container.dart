@@ -5,6 +5,8 @@ class RecipeContainer extends StatefulWidget {
   final bool isBookmarked;
   final bool showBookmarkIcon;
   final String recipeTitle;
+  final PageRoute route;
+
   //final Function(bool)? onBookmarkChanged;
 
   const RecipeContainer({
@@ -12,7 +14,7 @@ class RecipeContainer extends StatefulWidget {
     required this.path,
     required this.isBookmarked,
     required this.showBookmarkIcon,
-    required this.recipeTitle,
+    required this.recipeTitle, required this.route,
     // required this.onBookmarkChanged,
   });
 
@@ -22,20 +24,27 @@ class RecipeContainer extends StatefulWidget {
 
 class _RecipeContainerState extends State<RecipeContainer> {
   late bool _isBookmarked;
+  late PageRoute _route;
 
   @override
   void initState() {
     super.initState();
     _isBookmarked = widget.isBookmarked;
+    _route = widget.route;
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        Navigator.push(context, _route);
+      },
       child: Hero(
         tag: "recipeImage",
         child: Container(
           decoration: BoxDecoration(
-            image: DecorationImage(image: NetworkImage(widget.path), fit: BoxFit.cover),
+            image: DecorationImage(
+                image: NetworkImage(widget.path), fit: BoxFit.cover),
             borderRadius: BorderRadius.all(Radius.circular(30)),
           ),
           clipBehavior: Clip.hardEdge,
@@ -58,7 +67,8 @@ class _RecipeContainerState extends State<RecipeContainer> {
                   alignment: Alignment.bottomCenter,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final bool showBookmark = widget.showBookmarkIcon && constraints.maxWidth > 150;
+                      final bool showBookmark = widget.showBookmarkIcon &&
+                          constraints.maxWidth > 150;
 
                       return Padding(
                         padding: EdgeInsets.only(
@@ -98,11 +108,16 @@ class _RecipeContainerState extends State<RecipeContainer> {
                                       topLeft: Radius.circular(20),
                                       topRight: Radius.circular(20),
                                     ),
-                                    color: _isBookmarked ? Color(0xFF4a4459) : Color(0xffeaddff),
+                                    color: _isBookmarked
+                                        ? Color(0xFF4a4459)
+                                        : Color(0xffeaddff),
                                   ),
                                   child: Icon(
-                                    _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                                    color: _isBookmarked ? Color(0xffe8def8) : Color(0xFF4a4459),
+                                    _isBookmarked ? Icons.bookmark : Icons
+                                        .bookmark_border,
+                                    color: _isBookmarked
+                                        ? Color(0xffe8def8)
+                                        : Color(0xFF4a4459),
                                   ),
                                 ),
                               ),
