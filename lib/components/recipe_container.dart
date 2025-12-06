@@ -5,7 +5,7 @@ class RecipeContainer extends StatefulWidget {
   final bool isBookmarked;
   final bool showBookmarkIcon;
   final String recipeTitle;
-  final PageRoute route;
+  final Widget recipePage;
 
   //final Function(bool)? onBookmarkChanged;
 
@@ -14,7 +14,7 @@ class RecipeContainer extends StatefulWidget {
     required this.path,
     required this.isBookmarked,
     required this.showBookmarkIcon,
-    required this.recipeTitle, required this.route,
+    required this.recipeTitle, required this.recipePage,
     // required this.onBookmarkChanged,
   });
 
@@ -24,21 +24,22 @@ class RecipeContainer extends StatefulWidget {
 
 class _RecipeContainerState extends State<RecipeContainer> {
   late bool _isBookmarked;
-  late PageRoute _route;
+  late Widget _recipePage;
 
   @override
   void initState() {
     super.initState();
     _isBookmarked = widget.isBookmarked;
-    _route = widget.route;
+    _recipePage = widget.recipePage;
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, _route);
-      },
+        Navigator.push(context, MaterialPageRoute<void>(
+            builder: (context) => _recipePage));
+        },
       child: Hero(
         tag: "recipeImage",
         child: Container(
