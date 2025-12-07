@@ -21,39 +21,28 @@ class _CollapsedBottomNavBarMenuState extends State<CollapsedBottomNavBarMenu> {
         children: [
           SizedBox(
             width: MediaQuery.of(context).size.width - 90,
-            child: Hero(
-              tag: "searchBar",
-              child: GestureDetector(
-                onTap: () {
-                  // Navigator.pushNamed(context, '/search');
-                },
-                child: TextField(
-                  enabled: false,
-                  decoration: InputDecoration(
-                    suffixIcon: const Icon(
-                      Icons.search,
-                      color: Color(0xFF49454f),
-                    ),
-                    hintText: "Search",
-                    hintStyle: const TextStyle(
-                      fontFamily: "nunito",
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
-                      color: Color(0xFF49454f),
-                    ),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                  ),
+            child: TextField(
+              enabled: false,
+              decoration: InputDecoration(
+                suffixIcon: const Icon(Icons.search, color: Color(0xFF49454f)),
+                hintText: "Search",
+                hintStyle: const TextStyle(
+                  fontFamily: "nunito",
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
+                  color: Color(0xFF49454f),
                 ),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
             ),
           ),
           Hero(
-            tag: "openMenuButton",
+            tag: "menuButton",
             child: FilledButton.tonal(
               onPressed: () => BottomNavBarSwitcher.toggle(),
               style: FilledButton.styleFrom(
