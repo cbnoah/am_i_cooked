@@ -16,9 +16,27 @@ class BottomNavBarSwitcher extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: isExpanded,
       builder: (context, expanded, _) {
-        return expanded
-            ? const ExpandedBottomNavBarMenu()
-            : const CollapsedBottomNavBarMenu();
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: isExpanded.value ? const Offset(1.0, 0.0) : const Offset(-1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutCubic,
+                )),
+                child: child,
+              ),
+            );
+          },
+          child: expanded
+              ? const ExpandedBottomNavBarMenu(key: ValueKey('expanded'))
+              : const CollapsedBottomNavBarMenu(key: ValueKey('collapsed')),
+        );
       },
     );
   }
