@@ -17,9 +17,9 @@ class ExpandedBottomNavBarMenu extends StatelessWidget {
             style: FilledButton.styleFrom(
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(16),
-              backgroundColor: const Color(0xFFece6f0),
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
             ),
-            child: const Icon(Icons.add, color: Color(0xFF1d1b20)),
+            child: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           ButtonGroup(),
         ],
