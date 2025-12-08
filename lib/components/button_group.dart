@@ -25,7 +25,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            backgroundColor: Color(0xFFe8def8),
+            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(28),
@@ -35,17 +35,20 @@ class _ButtonGroupState extends State<ButtonGroup> {
               ),
             ),
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon(Icons.add_circle_outline, color: Color(0xFF4a4459)),
+              Icon(
+                Icons.add_circle_outline,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
               Text(
                 "Nouveau",
                 style: TextStyle(
                   fontFamily: "nunito",
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
-                  color: Color(0xFF4a4459),
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
             ],
@@ -57,22 +60,25 @@ class _ButtonGroupState extends State<ButtonGroup> {
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),
-            backgroundColor: const Color(0xFFe8def8),
+            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.bookmark, color: Color(0xFF4a4459)),
+              Icon(
+                Icons.bookmark,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
               Text(
                 "Favoris",
                 style: TextStyle(
                   fontFamily: "nunito",
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
-                  color: Color(0xFF4a4459),
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
             ],
@@ -84,7 +90,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),
-            backgroundColor: const Color(0xFFe8def8),
+            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
@@ -95,16 +101,19 @@ class _ButtonGroupState extends State<ButtonGroup> {
               ),
             ),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.account_circle_outlined, color: Color(0xFF4a4459)),
+              Icon(
+                Icons.account_circle_outlined,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
               Text(
                 "Profile",
                 style: TextStyle(
                   fontFamily: "nunito",
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
-                  color: Color(0xFF4a4459),
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
             ],
