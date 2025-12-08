@@ -45,13 +45,16 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Text(
           "Am I Cooked ?",
-          style: TextStyle(fontFamily: "bbh_sans_hegarty"),
+          style: TextStyle(
+            fontFamily: "bbh_sans_hegarty",
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         centerTitle: true,
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -63,12 +66,17 @@ class _MainPageState extends State<MainPage> {
                   fontWeight: FontWeight.w900,
                   fontStyle: FontStyle.italic,
                   fontSize: 36,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.left,
               ),
               Text(
                 "Voici quelques nouvelles recettes à tester",
-                style: TextStyle(fontFamily: "nunito", fontSize: 24),
+                style: TextStyle(
+                  fontFamily: "nunito",
+                  fontSize: 24,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 textAlign: TextAlign.left,
               ),
               Padding(
@@ -76,7 +84,7 @@ class _MainPageState extends State<MainPage> {
                   horizontal: 30.0,
                   vertical: 15.0,
                 ),
-                child: Divider(),
+                child: Divider(color: Theme.of(context).colorScheme.outline),
               ),
               Text(
                 "Recommendations : ",
@@ -84,6 +92,7 @@ class _MainPageState extends State<MainPage> {
                   fontFamily: "nunito",
                   fontWeight: FontWeight.w700,
                   fontSize: 22,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.left,
               ),
@@ -105,7 +114,7 @@ class _MainPageState extends State<MainPage> {
                   horizontal: 30.0,
                   vertical: 5.0,
                 ),
-                child: Divider(),
+                child: Divider(color: Theme.of(context).colorScheme.outline),
               ),
               Text(
                 "Tendance : ",
@@ -113,6 +122,7 @@ class _MainPageState extends State<MainPage> {
                   fontFamily: "nunito",
                   fontWeight: FontWeight.w700,
                   fontSize: 22,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.left,
               ),

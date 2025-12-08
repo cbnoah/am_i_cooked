@@ -73,7 +73,7 @@ class _RecipeContainerState extends State<RecipeContainer> {
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20),
                       ),
-                      color: Color(0xFFF2F2F2),
+                      color: Theme.of(context).colorScheme.secondaryContainer,
                     ),
                     alignment: Alignment.bottomCenter,
                     child: LayoutBuilder(
@@ -98,6 +98,9 @@ class _RecipeContainerState extends State<RecipeContainer> {
                                     style: TextStyle(
                                       fontFamily: "bbh_sans_hegarty",
                                       fontSize: 22,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                     softWrap: false,
@@ -124,16 +127,24 @@ class _RecipeContainerState extends State<RecipeContainer> {
                                         topRight: Radius.circular(20),
                                       ),
                                       color: _isBookmarked
-                                          ? Color(0xFF4a4459)
-                                          : Color(0xffeaddff),
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimaryContainer
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.primaryContainer,
                                     ),
                                     child: Icon(
                                       _isBookmarked
                                           ? Icons.bookmark
                                           : Icons.bookmark_border,
                                       color: _isBookmarked
-                                          ? Color(0xffe8def8)
-                                          : Color(0xFF4a4459),
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.tertiaryContainer
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimaryContainer,
                                     ),
                                   ),
                                 ),
