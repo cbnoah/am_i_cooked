@@ -24,20 +24,20 @@ class _CollapsedBottomNavBarMenuState extends State<CollapsedBottomNavBarMenu> {
             child: TextField(
               enabled: false,
               decoration: InputDecoration(
-                suffixIcon: const Icon(Icons.search, color: Color(0xFF49454f)),
+                suffixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 hintText: "Search",
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   fontFamily: "nunito",
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
-                  color: Color(0xFF49454f),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(30)),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey[200],
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
               ),
             ),
           ),
@@ -48,9 +48,9 @@ class _CollapsedBottomNavBarMenuState extends State<CollapsedBottomNavBarMenu> {
               style: FilledButton.styleFrom(
                 shape: const CircleBorder(),
                 padding: const EdgeInsets.all(16),
-                backgroundColor: const Color(0xFFeaddff),
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               ),
-              child: const Icon(Icons.add, color: Color(0xFF1d1b20)),
+              child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSecondaryContainer),
             ),
           ),
         ],
