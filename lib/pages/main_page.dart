@@ -11,16 +11,30 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final Map<String, bool> _bookmarks = {};
+
   List<Widget> _buildTestListForCarousel(String prefix) {
     return List.generate(5, (index) {
+      final key = '$prefix-$index';
       return RecipeContainer(
-        key: ValueKey('$prefix-$index'),
+        key: ValueKey(key),
         path:
             "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
-        isBookmarked: true,
+        isBookmarked: _bookmarks[key] ?? true,
         showBookmarkIcon: true,
         recipeTitle: 'Poulet Roti',
         recipePage: Placeholder(),
+        heroTag: key,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => Placeholder()));
+        },
+        onBookmarkChanged: (isBookmarked) {
+          setState(() {
+            _bookmarks[key] = isBookmarked;
+          });
+        },
       );
     });
   }
