@@ -1,11 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
 
 class Stars extends StatelessWidget {
   const Stars({super.key});
-
-  get M3Container => null;
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +23,9 @@ class Stars extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'assets/images/your_image.png',
-                width: 120,
-                height: 120,
+                'assets/images/5stars.png',
+                width: 50,
+                height: 50,
                 fit: BoxFit.cover,
               ),
             ),
