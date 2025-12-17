@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
-class ProfilPictureContainer extends StatelessWidget {
-  const ProfilPictureContainer({super.key});
+class ProfilePictureContainer extends StatelessWidget {
+  final String pathImage;
+  final bool isEditIconVisible;
+
+  const ProfilePictureContainer({
+    super.key,
+    required this.pathImage,
+    required this.isEditIconVisible,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +22,8 @@ class ProfilPictureContainer extends StatelessWidget {
           height: 150,
           width: 150,
           decoration: BoxDecoration(
-            image: const DecorationImage(
-              image: AssetImage('assets/images/avatar_image.jpg'),
+            image: DecorationImage(
+              image: NetworkImage(pathImage),
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(75),
@@ -30,11 +37,18 @@ class ProfilPictureContainer extends StatelessWidget {
             ],
           ),
           alignment: Alignment.bottomRight,
-          child: FloatingActionButton(onPressed: () {},
-          shape: CircleBorder(),
-          backgroundColor: Color(0xFF4F378A),
-          child: Icon(Icons.edit_outlined, color: Colors.white, size: 20,),
-          ),
+          child: isEditIconVisible
+              ? FloatingActionButton(
+                  onPressed: () {},
+                  shape: CircleBorder(),
+                  backgroundColor: Color(0xFF4F378A),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    color: Theme.of(context).colorScheme.surface,
+                    size: 25,
+                  ),
+                )
+              : null,
         ),
       ),
     );
