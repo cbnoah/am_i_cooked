@@ -1,0 +1,5 @@
+class cooking_page {
+
+
+
+}
