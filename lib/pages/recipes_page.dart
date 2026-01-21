@@ -1,49 +1,44 @@
 import 'package:flutter/material.dart';
-
+import '../components/criteria_bar.dart';
 import '../components/recipe_details.dart';
 
-class RecipeDetailPage extends StatelessWidget {
-  final String recipeTitle;
-  final String imagePath;
-
-  const RecipeDetailPage({
-    super.key,
-    required this.recipeTitle,
-    required this.imagePath,
-  });
-
+class RecipesPage extends StatelessWidget {
+  const RecipesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-
-        children: [
-
-          SizedBox(height: 50,),
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-              bottomLeft: Radius.circular(24),
-              bottomRight: Radius.circular(24),
-            ),
-            child: Image.network(
-              imagePath,
+      appBar: AppBar(
+        title: const Text('Détails de la recette'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+              height: 250,
               width: double.infinity,
-              height: 300,
               fit: BoxFit.cover,
             ),
-          ),
-          RecipeDetails(
-            recipeName: recipeTitle,
-            author: 'Chef Martin',
-            prepTime: 15,
-            cookTime: 45,
-            servings: 4,
-            difficulty: 'Facile',
-          ),
-        ],
+            const SizedBox(height: 16),
+
+            const RecipeCriteriaBar(
+              criteria: ['Végétarien', 'Rapide', '< 30 min', 'Sans gluten'],
+            ),
+
+            const SizedBox(height: 8),
+
+            const RecipeDetails(
+              recipeName: 'Poulet Roti',
+              author: 'Chef Jean',
+              prepTime: 15,
+              cookTime: 45,
+              servings: 4,
+              difficulty: 'Facile',
+            ),
+          ],
+        ),
       ),
     );
   }

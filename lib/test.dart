@@ -16,10 +16,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: RecipeDetailPage(
-        recipeTitle: 'Poulet Roti',
-        imagePath: 'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg',
-      ),
+      home: RecipesPage(),
     );
   }
 }

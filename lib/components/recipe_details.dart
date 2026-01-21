@@ -82,14 +82,14 @@ class RecipeDetails extends StatelessWidget {
           SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.signal_cellular_alt, size: 16, color: Colors.orange),
+              Icon(Icons.signal_cellular_alt, size: 16, color: Colors.green),
               SizedBox(width: 4),
               Text(
                 'Difficulté : $difficulty',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.orange,
+                  color: Colors.green,
                 ),
               ),
             ],
