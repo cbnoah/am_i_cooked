@@ -16,7 +16,7 @@ class RecipesPage extends StatelessWidget {
     super.key,
     this.recipeTitle = 'Poulet Roti',
     this.imagePath = "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
-    this.criteria = const ['Végétarien', 'Rapide', '< 30 min'],
+    this.criteria = const ['Poulet', 'Rapide', '< 30 min'],
     this.author = 'Chef Jean',
     this.prepTime = 15,
     this.cookTime = 45,
