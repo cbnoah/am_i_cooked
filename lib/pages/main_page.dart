@@ -29,9 +29,20 @@ class _MainPageState extends State<MainPage> {
         recipePage: RecipesPage(),
         heroTag: key,
         onTap: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => RecipesPage()));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => RecipesPage(
+                recipeTitle: recipeTitle,
+                imagePath: imagePath,
+                criteria: ['Végétarien', 'Rapide', '< 30 min'],
+                author: 'Chef Jean',
+                prepTime: 15,
+                cookTime: 45,
+                servings: 4,
+                difficulty: 'Facile',
+              ),
+            ),
+          );
         },
         onBookmarkChanged: (isBookmarked) {
           setState(() {
@@ -142,6 +153,13 @@ class _MainPageState extends State<MainPage> {
                   children: _buildTestListForCarousel('trends'),
                 ),
               ),
+              FilledButton(onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => RecipesPage(),
+                  ),
+                );
+              }, child: Text("Recette test") ),
             ],
           ),
         ),
