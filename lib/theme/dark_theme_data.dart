@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 ThemeData darkTheme = ThemeData(
+  useMaterial3: true,
   colorScheme: ColorScheme.light(
     surface: Colors.black,
     onSurface: Color(0xFFfef7ff),
