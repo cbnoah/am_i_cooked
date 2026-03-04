@@ -1,54 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
-class ProfilePicture extends StatelessWidget {
-  final String? imageUrl;
-  final String? initials;
-  final double size;
-  final Color backgroundColor;
+class ProfilePictureContainer extends StatelessWidget {
+  final String pathImage;
+  final bool isEditIconVisible;
 
-  const ProfilePicture({
+  const ProfilePictureContainer({
     super.key,
-    this.imageUrl,
-    this.initials,
-    this.size = 120,
-    this.backgroundColor = const Color(0xFF6C63FF),
+    required this.pathImage,
+    required this.isEditIconVisible,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 32),
-        child: ClipOval(
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: imageUrl != null
-                ? Image.network(
-                    imageUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _buildInitials(),
-                    loadingBuilder: (_, child, progress) =>
-                        progress == null ? child : _buildInitials(),
-                  )
-                : _buildInitials(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInitials() {
-    return Container(
-      color: backgroundColor,
+    return M3Container.sunny(
+      height: 200,
+      width: 200,
+      color: Color(0xFF4F378A),
       child: Center(
-        child: Text(
-          initials ?? '?',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: size * 0.38,
-            fontWeight: FontWeight.bold,
+        child: Container(
+          height: 150,
+          width: 150,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(pathImage),
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.circular(75),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white,
+                spreadRadius: 2,
+                blurRadius: 20,
+                offset: const Offset(0, 0),
+              ),
+            ],
           ),
+          alignment: Alignment.bottomRight,
+          child: isEditIconVisible
+              ? FloatingActionButton(
+                  onPressed: () {},
+                  shape: CircleBorder(),
+                  backgroundColor: Color(0xFF4F378A),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    color: Theme.of(context).colorScheme.surface,
+                    size: 25,
+                  ),
+                )
+              : null,
         ),
       ),
     );

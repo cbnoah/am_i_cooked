@@ -1,3 +1,4 @@
+import 'package:am_i_cooked/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/page_route_builder.dart';
@@ -86,7 +87,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
         ),
         FilledButton(
           onPressed: () {
-            Navigator.of(context).push(createRoute(const Placeholder()));
+            Navigator.of(context).push(createRoute(const ProfilePage()));
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),
