@@ -2,6 +2,8 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/pages/main_page.dart';
 import 'package:am_i_cooked/theme/dark_theme_data.dart';
 import 'package:am_i_cooked/theme/light_theme_data.dart';
+import 'package:am_i_cooked/components/profil_picture_container.dart';
+import 'package:am_i_cooked/components/xp_bar.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,6 +26,33 @@ class MyApp extends StatelessWidget {
         darkTheme: dark,
         home: MainPage(),
       ),
+    );
+  }
+}
+
+class Test extends StatefulWidget {
+  const Test({super.key});
+
+  @override
+  State<Test> createState() => _TestState();
+}
+
+class _TestState extends State<Test> {
+  @override
+  Widget build(BuildContext context) {
+  return Scaffold(
+    
+      body: Column(
+        children: [
+          ProfilePicture(),
+          XPBar(
+            level: 5,
+            currentXP: 350,
+            maxXP: 500,
+          ),
+        ],
+      ),
+
     );
   }
 }
