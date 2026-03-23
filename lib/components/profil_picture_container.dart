@@ -1,14 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
 class ProfilePictureContainer extends StatelessWidget {
   final String pathImage;
   final bool isEditIconVisible;
+  final VoidCallback? onEditPressed;
 
   const ProfilePictureContainer({
     super.key,
     required this.pathImage,
     required this.isEditIconVisible,
+    required this.onEditPressed,
   });
 
   @override
@@ -23,8 +26,10 @@ class ProfilePictureContainer extends StatelessWidget {
           width: 150,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: NetworkImage(pathImage),
-              fit: BoxFit.cover,
+              image: pathImage.startsWith("http")
+                ? NetworkImage(pathImage) as ImageProvider  
+                : FileImage(File(pathImage)),
+                fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(75),
             boxShadow: [
@@ -39,7 +44,7 @@ class ProfilePictureContainer extends StatelessWidget {
           alignment: Alignment.bottomRight,
           child: isEditIconVisible
               ? FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: onEditPressed,
                   shape: CircleBorder(),
                   backgroundColor: Color(0xFF4F378A),
                   child: Icon(
