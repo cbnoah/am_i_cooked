@@ -2,8 +2,6 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/pages/main_page.dart';
 import 'package:am_i_cooked/theme/dark_theme_data.dart';
 import 'package:am_i_cooked/theme/light_theme_data.dart';
-import 'package:am_i_cooked/components/profil_picture_container.dart';
-import 'package:am_i_cooked/components/xp_bar.dart';
 import 'package:flutter/material.dart';
 
 void main() {

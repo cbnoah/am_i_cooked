@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:am_i_cooked/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
