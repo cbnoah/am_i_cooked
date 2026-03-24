@@ -40,18 +40,15 @@ class _SearchPageState extends State<SearchPage> {
   final List<_Recipe> recipes = const [
     _Recipe(
       title: 'Recette test',
-      imageUrl:
-      'https://images.unsplash.com/photo-1604908176997-125f25cc500f?w=1200',
+      imageUrl: 'assets/fonts/image/recette_test.png',
     ),
     _Recipe(
       title: 'Recette test',
-      imageUrl:
-      'https://images.unsplash.com/photo-1604908176997-125f25cc500f?w=1200',
+      imageUrl: 'assets/fonts/image/recette_test.png',
     ),
     _Recipe(
       title: 'Recette test',
-      imageUrl:
-      'https://images.unsplash.com/photo-1604908176997-125f25cc500f?w=1200',
+      imageUrl: 'assets/fonts/image/recette_test.png',
     ),
   ];
 
@@ -131,7 +128,7 @@ class _SearchPageState extends State<SearchPage> {
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w500,
                       ),
                       value: selectedRegime,
                       items: regimes,
@@ -145,7 +142,7 @@ class _SearchPageState extends State<SearchPage> {
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
                         fontSize: 16,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w500,
                       ),
                       value: selectedAllergene,
                       items: allergenes,
@@ -255,10 +252,8 @@ class _PillDropdown<T> extends StatelessWidget {
           value: value,
           isExpanded: true,
           dropdownColor: Colors.white,
-          // hide default icon and render our own so we can center the text
           icon: const SizedBox.shrink(),
 
-          // When nothing selected: show centered hint with arrow on the right
           hint: Row(
             children: [
               Expanded(
@@ -273,7 +268,6 @@ class _PillDropdown<T> extends StatelessWidget {
             ],
           ),
 
-          // When something is selected: build a widget that centers the text
           selectedItemBuilder: (context) {
             return items.map((e) {
               return Row(
@@ -331,16 +325,9 @@ class _RecipeCard extends StatelessWidget {
         children: [
           AspectRatio(
             aspectRatio: 16 / 8,
-            child: Image.network(
+            child: Image.asset(
               imageUrl,
               fit: BoxFit.cover,
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return Container(
-                  color: Colors.black.withOpacity(0.05),
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              },
             ),
           ),
 
