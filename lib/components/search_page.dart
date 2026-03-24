@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:am_i_cooked/components/pill_dropdown.dart';
+import 'package:am_i_cooked/components/recipe_card.dart';
+import 'package:am_i_cooked/data/search_data.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -11,51 +14,24 @@ class _SearchPageState extends State<SearchPage> {
   String? selectedRegime;
   String? selectedAllergene;
 
-  final List<String> regimes = [
-    'Végétarien',
-    'Vegan',
-    'Sans gluten',
-    'Keto',
-    'Halal',
-  ];
-
-  final List<String> allergenes = [
-    'Lactose',
-    'Arachide',
-    'Oeuf',
-    'Fruits à coque',
-    'Soja',
-  ];
-
-  final List<String> labels = [
-    'Label',
-    'Label',
-    'Label',
-    'Label',
-    'Label',
-    'Label',
-    'Label',
-  ];
-
-  final List<_Recipe> recipes = const [
-    _Recipe(
+  final List<Recipe> recipes = const [
+    Recipe(
       title: 'Recette test',
-      imageUrl: 'assets/fonts/image/recette_test.png',
+      imageAssets: 'assets/fonts/image/recette_test.png',
     ),
-    _Recipe(
+    Recipe(
       title: 'Recette test',
-      imageUrl: 'assets/fonts/image/recette_test.png',
+      imageAssets: 'assets/fonts/image/recette_test.png',
     ),
-    _Recipe(
+    Recipe(
       title: 'Recette test',
-      imageUrl: 'assets/fonts/image/recette_test.png',
+      imageAssets: 'assets/fonts/image/recette_test.png',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     const bg = Color(0xFFF3F1FA);
-    const pill = Color(0xFF6750A4);
 
     return Scaffold(
       backgroundColor: bg,
@@ -123,7 +99,7 @@ class _SearchPageState extends State<SearchPage> {
               Row(
                 children: [
                   Expanded(
-                    child: _PillDropdown<String>(
+                    child: PillDropdown<String>(
                       hintText: 'Régimes',
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
@@ -131,13 +107,13 @@ class _SearchPageState extends State<SearchPage> {
                         fontWeight: FontWeight.w500,
                       ),
                       value: selectedRegime,
-                      items: regimes,
+                      items: SearchData.regimes,
                       onSelected: (v) => setState(() => selectedRegime = v),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _PillDropdown<String>(
+                    child: PillDropdown<String>(
                       hintText: 'Allergies',
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
@@ -145,7 +121,7 @@ class _SearchPageState extends State<SearchPage> {
                         fontWeight: FontWeight.w500,
                       ),
                       value: selectedAllergene,
-                      items: allergenes,
+                      items: SearchData.allergenes,
                       onSelected: (v) => setState(() => selectedAllergene = v),
                     ),
                   ),
@@ -158,7 +134,7 @@ class _SearchPageState extends State<SearchPage> {
                 height: 38,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: labels.length,
+                  itemCount: SearchData.labels.length,
                   separatorBuilder: (_, __) => const SizedBox(width: 10),
                   itemBuilder: (context, i) {
                     return Container(
@@ -174,7 +150,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       child: Text(
-                        labels[i],
+                        SearchData.labels[i],
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     );
@@ -201,9 +177,9 @@ class _SearchPageState extends State<SearchPage> {
                   separatorBuilder: (_, __) => const SizedBox(height: 14),
                   itemBuilder: (context, index) {
                     final r = recipes[index];
-                    return _RecipeCard(
+                    return RecipeCard(
                       title: r.title,
-                      imageUrl: r.imageUrl,
+                      imageAssets: r.imageAssets,
                       onBookmark: () {
                         // TODO: bookmark
                       },
@@ -217,175 +193,4 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
   }
-}
-
-
-class _PillDropdown<T> extends StatelessWidget {
-  const _PillDropdown({
-    super.key,
-    required this.hintText,
-    required this.value,
-    required this.items,
-    required this.onSelected,
-    required this.hintStyle,
-  });
-
-  final String hintText;
-  final T? value;
-  final List<T> items;
-  final ValueChanged<T?> onSelected;
-  final TextStyle hintStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    const pill = Color(0xFF6750A4);
-
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        color: pill,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: Colors.white,
-          icon: const SizedBox.shrink(),
-
-          hint: Row(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Text(
-                    hintText,
-                    style: hintStyle.copyWith(color: Colors.white),
-                  ),
-                ),
-              ),
-              const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-            ],
-          ),
-
-          selectedItemBuilder: (context) {
-            return items.map((e) {
-              return Row(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        e.toString(),
-                        style: hintStyle.copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-                ],
-              );
-            }).toList();
-          },
-
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-          ),
-
-          items: items
-              .map(
-                (e) => DropdownMenuItem<T>(
-                  value: e,
-                  child: Text(e.toString()),
-                ),
-              )
-              .toList(),
-          onChanged: onSelected,
-        ),
-      ),
-    );
-  }
-}
-
-class _RecipeCard extends StatelessWidget {
-  const _RecipeCard({
-    required this.title,
-    required this.imageUrl,
-    required this.onBookmark,
-  });
-
-  final String title;
-  final String imageUrl;
-  final VoidCallback onBookmark;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: Stack(
-        children: [
-          AspectRatio(
-            aspectRatio: 16 / 8,
-            child: Image.asset(
-              imageUrl,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 12,
-            child: Container(
-              height: 54,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: 'bbh_sans_hegarty',
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Material(
-                    color: const Color(0xFFEADEFF),
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: onBookmark,
-                      child: const SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Icon(
-                          Icons.bookmark_border,
-                          color: Color(0xFF6750A4),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-class _Recipe {
-  final String title;
-  final String imageUrl;
-  const _Recipe({required this.title, required this.imageUrl});
 }
