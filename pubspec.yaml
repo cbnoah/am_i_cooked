@@ -89,7 +89,7 @@ flutter:
     - family: "bbh_sans_hegarty"
       fonts:
         - asset: assets/fonts/bbh_sans_hegarty/BBHSansHegarty-Regular.ttf
-    - family: "nunito"
+    - family: "Nunito"
       fonts:
         - asset: "assets/fonts/nunito/Nunito-Regular.ttf"
         - asset: "assets/fonts/nunito/Nunito-Bold.ttf"
