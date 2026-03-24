@@ -225,16 +225,19 @@ class _SearchPageState extends State<SearchPage> {
 
 class _PillDropdown<T> extends StatelessWidget {
   const _PillDropdown({
+    super.key,
     required this.hintText,
     required this.value,
     required this.items,
-    required this.onSelected, required TextStyle hintStyle,
+    required this.onSelected,
+    required this.hintStyle,
   });
 
   final String hintText;
   final T? value;
   final List<T> items;
   final ValueChanged<T?> onSelected;
+  final TextStyle hintStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -252,25 +255,55 @@ class _PillDropdown<T> extends StatelessWidget {
           value: value,
           isExpanded: true,
           dropdownColor: Colors.white,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-          hint: Text(
-            hintText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
+          // hide default icon and render our own so we can center the text
+          icon: const SizedBox.shrink(),
+
+          // When nothing selected: show centered hint with arrow on the right
+          hint: Row(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Text(
+                    hintText,
+                    style: hintStyle.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+              const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+            ],
           ),
+
+          // When something is selected: build a widget that centers the text
+          selectedItemBuilder: (context) {
+            return items.map((e) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        e.toString(),
+                        style: hintStyle.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                ],
+              );
+            }).toList();
+          },
+
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w600,
           ),
+
           items: items
               .map(
                 (e) => DropdownMenuItem<T>(
-              value: e,
-              child: Text(e.toString()),
-            ),
-          )
+                  value: e,
+                  child: Text(e.toString()),
+                ),
+              )
               .toList(),
           onChanged: onSelected,
         ),
