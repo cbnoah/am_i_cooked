@@ -68,7 +68,6 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Barre de recherche ---
               Row(
                 children: [
                   Material(
@@ -97,8 +96,19 @@ class _SearchPageState extends State<SearchPage> {
                         children: [
                           Expanded(
                             child: TextField(
+                              style: const TextStyle(
+                                fontFamily: 'Nunito',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
                               decoration: InputDecoration(
                                 hintText: 'Hinted search text',
+                                hintStyle: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black45,
+                                ),
                                 border: InputBorder.none,
                               ),
                             ),
@@ -113,12 +123,16 @@ class _SearchPageState extends State<SearchPage> {
 
               const SizedBox(height: 16),
 
-              // --- Filtres (pills) ---
               Row(
                 children: [
                   Expanded(
                     child: _PillDropdown<String>(
                       hintText: 'Régimes',
+                      hintStyle: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
                       value: selectedRegime,
                       items: regimes,
                       onSelected: (v) => setState(() => selectedRegime = v),
@@ -128,6 +142,11 @@ class _SearchPageState extends State<SearchPage> {
                   Expanded(
                     child: _PillDropdown<String>(
                       hintText: 'Allergies',
+                      hintStyle: TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
                       value: selectedAllergene,
                       items: allergenes,
                       onSelected: (v) => setState(() => selectedAllergene = v),
@@ -138,7 +157,6 @@ class _SearchPageState extends State<SearchPage> {
 
               const SizedBox(height: 12),
 
-              // --- Chips horizontales ---
               SizedBox(
                 height: 38,
                 child: ListView.separated(
@@ -169,18 +187,17 @@ class _SearchPageState extends State<SearchPage> {
 
               const SizedBox(height: 14),
 
-              // --- Résultats ---
               const Text(
                 '25 Résultats',
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
+                  fontFamily: 'Nunito',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
               const SizedBox(height: 12),
 
-              // --- Liste des cartes ---
               Expanded(
                 child: ListView.separated(
                   itemCount: recipes.length,
@@ -205,14 +222,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-// -------------------- Widgets --------------------
 
 class _PillDropdown<T> extends StatelessWidget {
   const _PillDropdown({
     required this.hintText,
     required this.value,
     required this.items,
-    required this.onSelected,
+    required this.onSelected, required TextStyle hintStyle,
   });
 
   final String hintText;
@@ -295,7 +311,6 @@ class _RecipeCard extends StatelessWidget {
             ),
           ),
 
-          // Bandeau bas blanc arrondi
           Positioned(
             left: 12,
             right: 12,
@@ -315,6 +330,7 @@ class _RecipeCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
+                        fontFamily: 'bbh_sans_hegarty',
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -347,7 +363,6 @@ class _RecipeCard extends StatelessWidget {
   }
 }
 
-// -------------------- Models --------------------
 
 class _Recipe {
   final String title;
