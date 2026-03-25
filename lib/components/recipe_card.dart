@@ -16,11 +16,13 @@ class RecipeCard extends StatelessWidget {
     required this.title,
     required this.imageAssets,
     required this.onBookmark,
+    required this.isBookmarked,
   });
 
   final String title;
   final String imageAssets;
   final VoidCallback onBookmark;
+  final bool isBookmarked;
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +74,14 @@ class RecipeCard extends StatelessWidget {
                       child: InkWell(
                         customBorder: const CircleBorder(),
                         onTap: onBookmark,
-                        child: const SizedBox(
+                        child: SizedBox(
                           width: 40,
                           height: 40,
                           child: Icon(
-                            Icons.bookmark_border,
-                            color: Color(0xFF6750A4),
+                            isBookmarked
+                                ? Icons.bookmark
+                                : Icons.bookmark_border_outlined,
+                            color: const Color(0xFF6750A4),
                           ),
                         ),
                       ),

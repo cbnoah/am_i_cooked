@@ -17,11 +17,11 @@ class MultiSelectPillDropdown<T> extends StatefulWidget {
   final TextStyle hintStyle;
 
   @override
-  State<MultiSelectPillDropdown<T>> createState() =>
-      _MultiSelectPillDropdownState<T>();
+  State<MultiSelectPillDropdown<T>> createState() => _MultiSelectPillDropdownState<T>();
 }
 
-class _MultiSelectPillDropdownState<T> extends State<MultiSelectPillDropdown<T>> {
+class _MultiSelectPillDropdownState<T>
+    extends State<MultiSelectPillDropdown<T>> {
   late List<T> selectedItems;
 
   @override
@@ -34,29 +34,30 @@ class _MultiSelectPillDropdownState<T> extends State<MultiSelectPillDropdown<T>>
   Widget build(BuildContext context) {
     const pill = Color(0xFF6750A4);
 
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        color: pill,
+    return Material(
+      color: pill,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
         borderRadius: BorderRadius.circular(999),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: GestureDetector(
         onTap: () => _showSelectionDialog(context),
-        child: Row(
-          children: [
-            Expanded(
-              child: Center(
-                child: Text(
-                  selectedItems.isEmpty
-                      ? widget.hintText
-                      : '${selectedItems.length} sélectionné(s)',
-                  style: widget.hintStyle.copyWith(color: Colors.white),
+        child: Container(
+          height: 44,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Text(
+                    selectedItems.isEmpty
+                        ? widget.hintText
+                        : '${selectedItems.length} sélectionné(s)',
+                    style: widget.hintStyle.copyWith(color: Colors.white),
+                  ),
                 ),
               ),
-            ),
-            const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-          ],
+              const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+            ],
+          ),
         ),
       ),
     );
@@ -89,32 +90,32 @@ class _MultiSelectPillDropdownState<T> extends State<MultiSelectPillDropdown<T>>
                   .entries
                   .map(
                     (entry) {
-                      final item = entry.value;
-                      return CheckboxListTile(
-                        activeColor: const Color(0xFF6750A4),
-                        checkColor: Colors.white,
-                        title: Text(
-                          item.toString(),
-                          style: const TextStyle(
-                            fontFamily: 'Nunito',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        value: selectedItems.contains(item),
-                        onChanged: (isChecked) {
-                          setStateDialog(() {
-                            if (isChecked == true) {
-                              selectedItems.add(item);
-                            } else {
-                              selectedItems.remove(item);
-                            }
-                          });
-                          widget.onSelected(List.from(selectedItems));
-                        },
-                      );
+                  final item = entry.value;
+                  return CheckboxListTile(
+                    activeColor: const Color(0xFF6750A4),
+                    checkColor: Colors.white,
+                    title: Text(
+                      item.toString(),
+                      style: const TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    value: selectedItems.contains(item),
+                    onChanged: (isChecked) {
+                      setStateDialog(() {
+                        if (isChecked == true) {
+                          selectedItems.add(item);
+                        } else {
+                          selectedItems.remove(item);
+                        }
+                      });
+                      widget.onSelected(List.from(selectedItems));
                     },
-                  )
+                  );
+                },
+              )
                   .toList(),
             ),
           ),
@@ -122,7 +123,8 @@ class _MultiSelectPillDropdownState<T> extends State<MultiSelectPillDropdown<T>>
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: const Color(0xFF6750A4),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               onPressed: () => Navigator.pop(dialogContext),
               child: const Text(
@@ -141,4 +143,3 @@ class _MultiSelectPillDropdownState<T> extends State<MultiSelectPillDropdown<T>>
     );
   }
 }
-

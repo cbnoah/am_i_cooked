@@ -29,6 +29,15 @@ class _SearchPageState extends State<SearchPage> {
     ),
   ];
 
+  late List<bool> bookmarked;
+
+  @override
+  void initState() {
+    super.initState();
+    // au début, aucune recette n'est bookmarkée
+    bookmarked = List<bool>.filled(recipes.length, false);
+  }
+
   @override
   Widget build(BuildContext context) {
     const bg = Color(0xFFF3F1FA);
@@ -69,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
                         children: [
                           Expanded(
                             child: TextField(
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Nunito',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -104,8 +113,7 @@ class _SearchPageState extends State<SearchPage> {
                       borderRadius: BorderRadius.circular(24),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(24),
-                        onTap: () {
-                        },
+                        onTap: () {},
                         child: MultiSelectPillDropdown<String>(
                           hintText: 'Régimes',
                           hintStyle: const TextStyle(
@@ -115,7 +123,8 @@ class _SearchPageState extends State<SearchPage> {
                           ),
                           values: selectedRegimes,
                           items: SearchData.regimes,
-                          onSelected: (v) => setState(() => selectedRegimes = v),
+                          onSelected: (v) =>
+                              setState(() => selectedRegimes = v),
                         ),
                       ),
                     ),
@@ -127,8 +136,7 @@ class _SearchPageState extends State<SearchPage> {
                       borderRadius: BorderRadius.circular(24),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(24),
-                        onTap: () {
-                        },
+                        onTap: () {},
                         child: MultiSelectPillDropdown<String>(
                           hintText: 'Allergènes',
                           hintStyle: const TextStyle(
@@ -199,7 +207,12 @@ class _SearchPageState extends State<SearchPage> {
                     return RecipeCard(
                       title: r.title,
                       imageAssets: r.imageAssets,
-                      onBookmark: () {},
+                      isBookmarked: bookmarked[index],
+                      onBookmark: () {
+                        setState(() {
+                          bookmarked[index] = !bookmarked[index];
+                        });
+                      },
                     );
                   },
                 ),
