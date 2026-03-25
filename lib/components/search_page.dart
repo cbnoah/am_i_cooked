@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:am_i_cooked/components/pill_dropdown.dart';
+import 'package:am_i_cooked/components/multi_select_pill_dropdown.dart';
 import 'package:am_i_cooked/components/recipe_card.dart';
 import 'package:am_i_cooked/data/search_data.dart';
 
@@ -11,8 +11,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  String? selectedRegime;
-  String? selectedAllergene;
+  List<String> selectedRegimes = [];
+  List<String> selectedAllergenes = [];
 
   final List<Recipe> recipes = const [
     Recipe(
@@ -99,30 +99,30 @@ class _SearchPageState extends State<SearchPage> {
               Row(
                 children: [
                   Expanded(
-                    child: PillDropdown<String>(
+                    child: MultiSelectPillDropdown<String>(
                       hintText: 'Régimes',
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
-                      value: selectedRegime,
+                      values: selectedRegimes,
                       items: SearchData.regimes,
-                      onSelected: (v) => setState(() => selectedRegime = v),
+                      onSelected: (v) => setState(() => selectedRegimes = v),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: PillDropdown<String>(
+                    child: MultiSelectPillDropdown<String>(
                       hintText: 'Allergies',
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
-                      value: selectedAllergene,
+                      values: selectedAllergenes,
                       items: SearchData.allergenes,
-                      onSelected: (v) => setState(() => selectedAllergene = v),
+                      onSelected: (v) => setState(() => selectedAllergenes = v),
                     ),
                   ),
                 ],
