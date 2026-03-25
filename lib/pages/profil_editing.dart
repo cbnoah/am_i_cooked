@@ -1,22 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:am_i_cooked/pages/profil_editing.dart';
-import 'package:am_i_cooked/components/my_recipes_listview.dart';
 import 'package:am_i_cooked/components/profil_picture_container.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:http/http.dart' as http;
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class ProfileEditingPage extends StatefulWidget {
+  const ProfileEditingPage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileEditingPage> createState() => _ProfileEditingPageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  bool _myRecipesExpanded = false;
+class _ProfileEditingPageState extends State<ProfileEditingPage> {
   String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
@@ -193,50 +190,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _toggleMyRecipesExpanded() {
-    setState(() => _myRecipesExpanded = !_myRecipesExpanded);
-  }
-
-  bool _getMyRecipesExpanded() => _myRecipesExpanded;
-
   Widget _buildProfileSection() {
     return Column(
       children: [
         ProfilePictureContainer(
-          pathImage: _imagePath,
-          isEditIconVisible: true,
-          onEditPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProfileEditingPage()),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "LVL 4",
-              style: TextStyle(
-                fontFamily: "bbh_sans_hegarty",
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            Text(
-              "20%",
-              style: TextStyle(
-                fontFamily: "bbh_sans_hegarty",
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        LinearProgressIndicator(
-          value: 0.2,
-          minHeight: 8,
-          color: Theme.of(context).colorScheme.primary,
-          backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        pathImage: _imagePath,
+        isEditIconVisible: false,
+        onEditPressed: _isLoading ? null : _pickImage,  // <- appelle _pickImage au clic
         ),
         const SizedBox(height: 10),
       ],
@@ -257,47 +217,87 @@ class _ProfilePageState extends State<ProfilePage> {
           style: TextStyle(fontFamily: "bbh_sans_hegarty", fontSize: 22),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings_outlined),
-          ),
-        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Stack(
+      body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.all(
-              _myRecipesExpanded ? 12.0 : 20.0,
-            ).copyWith(top: _myRecipesExpanded ? 8.0 : 0),
-            child: Column(
-              children: [
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: _myRecipesExpanded ? 0.0 : 1.0,
-                    child: _myRecipesExpanded
-                        ? const SizedBox.shrink()
-                        : _buildProfileSection(),
-                  ),
-                ),
-                Expanded(
-                  child: MyRecipesListview(
-                    toggleMyRecipesExpanded: _toggleMyRecipesExpanded,
-                    getMyRecipesExpanded: _getMyRecipesExpanded,
-                  ),
-                ),
-              ],
-            ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildProfileSection(),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
+          Stack(
+            alignment: AlignmentGeometry.center,
+            children: <Widget>[
+              Container(color: Colors.white, width: 350, height: 425),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        color: Colors.blueGrey,
+                        padding: const EdgeInsets.all(12.0),
+                        width: 300,
+                        height: 100,
+                        child: const Center(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: "Pseudonyme",
+                              border: OutlineInputBorder(),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.blueGrey,
+                        padding: const EdgeInsets.all(12.0),
+                        width: 300,
+                        height: 100,
+                        child: const Center(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: "Nom d'utilisateur",
+                              border: OutlineInputBorder(),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.blueGrey,
+                        padding: const EdgeInsets.all(12.0),
+                        width: 300,
+                        height: 100,
+                        child: const Center(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: "Description",
+                              border: OutlineInputBorder(),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    color: Colors.blueGrey,
+                    padding: const EdgeInsets.all(12.0),
+                    width: 300,
+                    height: 100,
+                    child: const Center(
+                      child: Text(
+                        "Cette page est en cours de développement, vous pouvez cependant changer votre photo de profil en cliquant dessus.",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     );
