@@ -114,7 +114,7 @@ class _SearchPageState extends State<SearchPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: MultiSelectPillDropdown<String>(
-                      hintText: 'Allergies',
+                      hintText: 'Allergènes',
                       hintStyle: TextStyle(
                         fontFamily: 'Nunito',
                         fontSize: 16,
