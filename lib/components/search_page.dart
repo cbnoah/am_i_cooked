@@ -1,8 +1,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:am_i_cooked/components/multi_select_pill_dropdown.dart';
-import 'package:am_i_cooked/components/recipe_card.dart';
+import 'package:am_i_cooked/components/recipe_container.dart';
 import 'package:am_i_cooked/data/search_data.dart';
+
+class Recipe {
+  final String title;
+  final String imageAssets;
+
+  const Recipe({
+    required this.title,
+    required this.imageAssets,
+  });
+}
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -28,7 +38,6 @@ class _SearchPageState extends State<SearchPage> {
       title: 'Recette test',
       imageAssets: 'assets/fonts/image/recette_test.png',
     ),
-
   ];
 
   late List<bool> bookmarked;
@@ -103,9 +112,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               Row(
                 children: [
                   Expanded(
@@ -155,9 +162,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 12),
-
               SizedBox(
                 height: 38,
                 child: ListView.separated(
@@ -185,39 +190,39 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
               ),
-
               const SizedBox(height: 14),
-
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                    '${recipes.length} résultats',
-                    style: const TextStyle(
-                      fontFamily: 'Nunito',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  '${recipes.length} résultats',
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
                   ),
-
+                ),
               ),
-
               const SizedBox(height: 12),
-
               Expanded(
                 child: ListView.separated(
                   itemCount: recipes.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 14),
                   itemBuilder: (context, index) {
                     final r = recipes[index];
-                    return RecipeCard(
-                      title: r.title,
-                      imageAssets: r.imageAssets,
-                      isBookmarked: bookmarked[index],
-                      onBookmark: () {
-                        setState(() {
-                          bookmarked[index] = !bookmarked[index];
-                        });
-                      },
+                    return SizedBox(
+                      height: 220,
+                      child: RecipeContainer(
+                        path: r.imageAssets,
+                        isBookmarked: bookmarked[index],
+                        showBookmarkIcon: true,
+                        recipeTitle: r.title,
+                        recipePage: Scaffold(
+                          appBar: AppBar(title: Text(r.title)),
+                          body: const Center(
+                            child: Text('Page recette'),
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
