@@ -194,9 +194,23 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     return Column(
       children: [
         ProfilePictureContainer(
-        pathImage: _imagePath,
-        isEditIconVisible: false,
-        onEditPressed: _isLoading ? null : _pickImage,  // <- appelle _pickImage au clic
+          pathImage: _imagePath,
+          isEditIconVisible: false,
+          onEditPressed: _isLoading ? null : _pickImage,
+        ),
+        const SizedBox(height: 16),
+        GestureDetector(
+          onTap: _isLoading ? null : _pickImage,
+          child: Text(
+            "Modifier votre photo",
+            style: TextStyle(
+              fontFamily: "nunito",
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).colorScheme.onSurface,
+              decoration: TextDecoration.underline,
+            ),
+          ),
         ),
         const SizedBox(height: 10),
       ],
@@ -207,98 +221,192 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
+          // Add good color for AppBar
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back),
         ),
         title: Text(
-          "Votre Profil",
+          "Modification du profil",
           style: TextStyle(fontFamily: "bbh_sans_hegarty", fontSize: 22),
         ),
         centerTitle: true,
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Column(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildProfileSection(),
-          ),
-          Stack(
-            alignment: AlignmentGeometry.center,
-            children: <Widget>[
-              Container(color: Colors.white, width: 350, height: 425),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        color: Colors.blueGrey,
-                        padding: const EdgeInsets.all(12.0),
-                        width: 300,
-                        height: 100,
-                        child: const Center(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Pseudonyme",
-                              border: OutlineInputBorder(),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        color: Colors.blueGrey,
-                        padding: const EdgeInsets.all(12.0),
-                        width: 300,
-                        height: 100,
-                        child: const Center(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Nom d'utilisateur",
-                              border: OutlineInputBorder(),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        color: Colors.blueGrey,
-                        padding: const EdgeInsets.all(12.0),
-                        width: 300,
-                        height: 100,
-                        child: const Center(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Description",
-                              border: OutlineInputBorder(),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: _buildProfileSection(),
+            ),
+            Stack(
+              alignment: AlignmentGeometry.topCenter,
+              children: <Widget>[
+                Container(
+                  width: 350,
+                  height: 425,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(100),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
-                  Container(
-                    color: Colors.blueGrey,
-                    padding: const EdgeInsets.all(12.0),
-                    width: 300,
-                    height: 100,
-                    child: const Center(
-                      child: Text(
-                        "Cette page est en cours de développement, vous pouvez cependant changer votre photo de profil en cliquant dessus.",
-                        textAlign: TextAlign.center,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20.0,
+                        left: 15.0,
+                        right: 15.0,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                label: const Text("Pseudonyme"),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer,
+                                    width: 2,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                label: const Text("Nom d'utilisateur"),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer,
+                                    width: 2,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25.0,
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                label: const Text("Nom d'utilisateur"),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer,
+                                    width: 2,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                    Container(
+                      padding: const EdgeInsets.only(top: 100.0),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // TODO: save profile changes
+                            _showSuccessSnackbar(
+                              'Profil mis à jour avec succès!',
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 50.0,
+                              vertical: 25.0,
+                            ),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.save,
+                                size: 24,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Sauvegarder',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
