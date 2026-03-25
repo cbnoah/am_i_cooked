@@ -99,30 +99,49 @@ class _SearchPageState extends State<SearchPage> {
               Row(
                 children: [
                   Expanded(
-                    child: MultiSelectPillDropdown<String>(
-                      hintText: 'Régimes',
-                      hintStyle: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(24),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(24),
+                        onTap: () {
+                        },
+                        child: MultiSelectPillDropdown<String>(
+                          hintText: 'Régimes',
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          values: selectedRegimes,
+                          items: SearchData.regimes,
+                          onSelected: (v) => setState(() => selectedRegimes = v),
+                        ),
                       ),
-                      values: selectedRegimes,
-                      items: SearchData.regimes,
-                      onSelected: (v) => setState(() => selectedRegimes = v),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: MultiSelectPillDropdown<String>(
-                      hintText: 'Allergènes',
-                      hintStyle: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(24),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(24),
+                        onTap: () {
+                        },
+                        child: MultiSelectPillDropdown<String>(
+                          hintText: 'Allergènes',
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          values: selectedAllergenes,
+                          items: SearchData.allergenes,
+                          onSelected: (v) =>
+                              setState(() => selectedAllergenes = v),
+                        ),
                       ),
-                      values: selectedAllergenes,
-                      items: SearchData.allergenes,
-                      onSelected: (v) => setState(() => selectedAllergenes = v),
                     ),
                   ),
                 ],
@@ -180,9 +199,7 @@ class _SearchPageState extends State<SearchPage> {
                     return RecipeCard(
                       title: r.title,
                       imageAssets: r.imageAssets,
-                      onBookmark: () {
-                        // TODO: bookmark
-                      },
+                      onBookmark: () {},
                     );
                   },
                 ),
