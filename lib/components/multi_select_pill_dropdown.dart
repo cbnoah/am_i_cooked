@@ -67,41 +67,73 @@ class _MultiSelectPillDropdownState<T> extends State<MultiSelectPillDropdown<T>>
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setStateDialog) => AlertDialog(
-          title: Text(widget.hintText),
+          backgroundColor: const Color(0xFFF3F1FA),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+          title: Text(
+            widget.hintText,
+            style: const TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF6750A4),
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: widget.items
+                  .asMap()
+                  .entries
                   .map(
-                    (item) => CheckboxListTile(
-                      title: Text(
-                        item.toString(),
-                        style: const TextStyle(
-                          fontFamily: 'Nunito',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    (entry) {
+                      final item = entry.value;
+                      return CheckboxListTile(
+                        activeColor: const Color(0xFF6750A4),
+                        checkColor: Colors.white,
+                        title: Text(
+                          item.toString(),
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      value: selectedItems.contains(item),
-                      onChanged: (isChecked) {
-                        setStateDialog(() {
-                          if (isChecked == true) {
-                            selectedItems.add(item);
-                          } else {
-                            selectedItems.remove(item);
-                          }
-                        });
-                        widget.onSelected(List.from(selectedItems));
-                      },
-                    ),
+                        value: selectedItems.contains(item),
+                        onChanged: (isChecked) {
+                          setStateDialog(() {
+                            if (isChecked == true) {
+                              selectedItems.add(item);
+                            } else {
+                              selectedItems.remove(item);
+                            }
+                          });
+                          widget.onSelected(List.from(selectedItems));
+                        },
+                      );
+                    },
                   )
                   .toList(),
             ),
           ),
           actions: [
             TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF6750A4),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Fermer'),
+              child: const Text(
+                'Fermer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Nunito',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
