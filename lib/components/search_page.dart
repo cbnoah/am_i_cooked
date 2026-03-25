@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:am_i_cooked/components/multi_select_pill_dropdown.dart';
 import 'package:am_i_cooked/components/recipe_card.dart';
@@ -27,6 +28,7 @@ class _SearchPageState extends State<SearchPage> {
       title: 'Recette test',
       imageAssets: 'assets/fonts/image/recette_test.png',
     ),
+
   ];
 
   late List<bool> bookmarked;
@@ -34,7 +36,6 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    // au début, aucune recette n'est bookmarkée
     bookmarked = List<bool>.filled(recipes.length, false);
   }
 
@@ -187,13 +188,17 @@ class _SearchPageState extends State<SearchPage> {
 
               const SizedBox(height: 14),
 
-              const Text(
-                '25 Résultats',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                    '${recipes.length} résultats',
+                    style: const TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
               ),
 
               const SizedBox(height: 12),
