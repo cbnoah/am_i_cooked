@@ -44,7 +44,7 @@ class RecipeCard extends StatelessWidget {
               bottom: 0,
               child: Container(
                 height: 58,
-                padding: const EdgeInsets.symmetric(horizontal: 18),
+                padding: const EdgeInsets.only(left: 18, right: 14),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.95),
                   borderRadius: const BorderRadius.only(
@@ -53,36 +53,47 @@ class RecipeCard extends StatelessWidget {
                   ),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      child: Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontFamily: 'bbh_sans_hegarty',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontFamily: 'bbh_sans_hegarty',
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Material(
-                      color: const Color(0xFFEADEFF),
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: onBookmark,
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            isBookmarked
-                                ? Icons.bookmark
-                                : Icons.bookmark_border_outlined,
-                            color: const Color(0xFF6750A4),
+                    GestureDetector(
+                      onTap: onBookmark,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        margin: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          color: isBookmarked
+                              ? const Color(0xFF6750A4)
+                              : const Color(0xFFEADEFF),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
                           ),
+                        ),
+                        child: Icon(
+                          isBookmarked
+                              ? Icons.bookmark
+                              : Icons.bookmark_border_outlined,
+                          color: isBookmarked
+                              ? const Color(0xFFF3EDFF)
+                              : const Color(0xFF6750A4),
+                          size: 32,
                         ),
                       ),
                     ),
