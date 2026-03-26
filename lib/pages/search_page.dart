@@ -1,8 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:am_i_cooked/components/multi_select_pill_dropdown.dart';
 import 'package:am_i_cooked/components/recipe_card.dart';
 import 'package:am_i_cooked/data/search_data.dart';
+
+import '../components/recipe_container.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -12,39 +13,34 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  List<String> _filterSelectedLabels = [];
+  final Map<String, bool> _bookmarks = {};
   List<String> selectedRegimes = [];
   List<String> selectedAllergenes = [];
 
-  final List<Recipe> recipes = const [
-    Recipe(
-      title: 'Recette test',
-      imageAssets: 'assets/fonts/image/recette_test.png',
-    ),
-    Recipe(
-      title: 'Recette test',
-      imageAssets: 'assets/fonts/image/recette_test.png',
-    ),
-    Recipe(
-      title: 'Recette test',
-      imageAssets: 'assets/fonts/image/recette_test.png',
-    ),
-
-  ];
-
-  late List<bool> bookmarked;
-
-  @override
-  void initState() {
-    super.initState();
-    bookmarked = List<bool>.filled(recipes.length, false);
-  }
+  late final List<RecipeContainer> recipes = List.generate(5, (index) {
+    final key = 'search-$index';
+    return RecipeContainer(
+      key: ValueKey(key),
+      path:
+          "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+      isBookmarked: _bookmarks[key] ?? true,
+      showBookmarkIcon: true,
+      recipeTitle: 'Poulet Roti',
+      recipePageLink: '/recipe/$key',
+      heroTag: key,
+      onBookmarkChanged: () {
+        setState(() {
+          _bookmarks[key] = !(_bookmarks[key] ?? true);
+        });
+      },
+    );
+  });
 
   @override
   Widget build(BuildContext context) {
-    const bg = Color(0xFFF3F1FA);
-
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -72,31 +68,41 @@ class _SearchPageState extends State<SearchPage> {
                       height: 44,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.55),
+                        color: Colors.white.withAlpha(140),
                         borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.black45.withAlpha(100),
+                        ),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Expanded(
                             child: TextField(
-                              style: TextStyle(
+                              textAlign: TextAlign.left,
+                              textAlignVertical: TextAlignVertical.center,
+                              style: const TextStyle(
                                 fontFamily: 'Nunito',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
+                                height: 1.0,
                               ),
                               decoration: InputDecoration(
+                                isCollapsed: true,
+                                contentPadding: EdgeInsets.zero,
                                 hintText: 'Hinted search text',
                                 hintStyle: TextStyle(
                                   fontFamily: 'Nunito',
                                   fontSize: 16,
+                                  // même taille que style
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.black45,
+                                  color: Colors.black.withAlpha(200),
+                                  height: 1.0,
                                 ),
                                 border: InputBorder.none,
                               ),
                             ),
                           ),
-                          Icon(Icons.search),
+                          const Icon(Icons.search),
                         ],
                       ),
                     ),
@@ -156,31 +162,50 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ),
 
-              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Divider(
+                  height: 32,
+                  thickness: 1.5,
+                  color: Theme.of(context).colorScheme.tertiaryContainer,
+                ),
+              ),
 
               SizedBox(
                 height: 38,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: SearchData.labels.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  separatorBuilder: (_, _) => const SizedBox(width: 10),
                   itemBuilder: (context, i) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.black.withOpacity(0.15),
+                    final String filter = SearchData.labels[i];
+                    final bool isSelected = _filterSelectedLabels.contains(
+                      filter,
+                    );
+                    return ChoiceChip(
+                      label: Text(SearchData.labels[i]),
+                      selected: isSelected,
+                      selectedColor: Theme.of(
+                        context,
+                      ).colorScheme.primaryContainer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: isSelected
+                              ? Colors.transparent
+                              : Theme.of(context).colorScheme.tertiaryContainer,
+                          width: 1.5,
                         ),
                       ),
-                      child: Text(
-                        SearchData.labels[i],
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      onSelected: (bool selected) {
+                        setState(() {
+                          if (selected) {
+                            _filterSelectedLabels.add(filter);
+                          } else {
+                            _filterSelectedLabels.remove(filter);
+                          }
+                        });
+                      },
                     );
                   },
                 ),
@@ -191,33 +216,41 @@ class _SearchPageState extends State<SearchPage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                    '${recipes.length} résultats',
-                    style: const TextStyle(
-                      fontFamily: 'Nunito',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  '${recipes.length} résultats',
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
                   ),
-
+                ),
               ),
 
               const SizedBox(height: 12),
 
               Expanded(
                 child: ListView.separated(
-                  itemCount: recipes.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 14),
+                  scrollDirection: Axis.vertical,
+                  itemCount: 5,
+                  separatorBuilder: (context, index) => SizedBox(height: 20),
                   itemBuilder: (context, index) {
-                    final r = recipes[index];
-                    return RecipeCard(
-                      title: r.title,
-                      imageAssets: r.imageAssets,
-                      isBookmarked: bookmarked[index],
-                      onBookmark: () {
-                        setState(() {
-                          bookmarked[index] = !bookmarked[index];
-                        });
-                      },
+                    final key = 'profile-recipe-$index';
+                    return SizedBox(
+                      height: 200,
+                      child: RecipeContainer(
+                        key: ValueKey(key),
+                        path:
+                            "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+                        isBookmarked: _bookmarks[key] ?? true,
+                        showBookmarkIcon: true,
+                        recipeTitle: 'Poulet Roti',
+                        recipePageLink: '/recipe/$key',
+                        heroTag: key,
+                        onBookmarkChanged: () {
+                          setState(() {
+                            _bookmarks[key] = !(_bookmarks[key] ?? true);
+                          });
+                        },
+                      ),
                     );
                   },
                 ),
