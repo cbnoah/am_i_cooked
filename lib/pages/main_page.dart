@@ -23,16 +23,11 @@ class _MainPageState extends State<MainPage> {
         isBookmarked: _bookmarks[key] ?? true,
         showBookmarkIcon: true,
         recipeTitle: 'Poulet Roti',
-        recipePage: Placeholder(),
+        recipePageLink: '/recipe/$key',
         heroTag: key,
-        onTap: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => Placeholder()));
-        },
-        onBookmarkChanged: (isBookmarked) {
+        onBookmarkChanged: () {
           setState(() {
-            _bookmarks[key] = isBookmarked;
+            _bookmarks[key] = !(_bookmarks[key] ?? true);
           });
         },
       );
@@ -103,6 +98,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 child: CarouselView.weighted(
                   itemSnapping: true,
+                  enableSplash: false,
                   // WARNING : flexWeights makes the carousel moves very fast if the weights in the beginning are low (flutter bug still not fixed
                   // see https://github.com/flutter/flutter/issues/160350)
                   flexWeights: [2, 7, 2],

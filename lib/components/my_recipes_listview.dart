@@ -5,7 +5,11 @@ class MyRecipesListview extends StatefulWidget {
   final dynamic toggleMyRecipesExpanded;
   final dynamic getMyRecipesExpanded;
 
-  const MyRecipesListview({super.key, required this.toggleMyRecipesExpanded, required this.getMyRecipesExpanded});
+  const MyRecipesListview({
+    super.key,
+    required this.toggleMyRecipesExpanded,
+    required this.getMyRecipesExpanded,
+  });
 
   @override
   State<MyRecipesListview> createState() => _MyRecipesListviewState();
@@ -47,7 +51,9 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-              icon: _getMyRecipesExpanded() ? Icon(Icons.keyboard_arrow_down, size: 35,): Icon(Icons.keyboard_arrow_up, size: 35),
+              icon: _getMyRecipesExpanded()
+                  ? Icon(Icons.keyboard_arrow_down, size: 35)
+                  : Icon(Icons.keyboard_arrow_up, size: 35),
               style: ButtonStyle(
                 padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
                 minimumSize: WidgetStateProperty.all<Size>(
@@ -81,16 +87,11 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
                         isBookmarked: _bookmarks[key] ?? true,
                         showBookmarkIcon: true,
                         recipeTitle: 'Poulet Roti',
-                        recipePage: Placeholder(),
+                        recipePageLink: '/recipe/$key',
                         heroTag: key,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => Placeholder()),
-                          );
-                        },
-                        onBookmarkChanged: (isBookmarked) {
+                        onBookmarkChanged: () {
                           setState(() {
-                            _bookmarks[key] = isBookmarked;
+                            _bookmarks[key] = !(_bookmarks[key] ?? true);
                           });
                         },
                       ),
