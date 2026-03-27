@@ -23,9 +23,6 @@ class MyApp extends StatelessWidget {
         theme: light,
         darkTheme: dark,
         home: MainPage(),
-        routes: {
-          '/recipes': (context) => const RecipesPage(),
-        },
       ),
     );
   }
