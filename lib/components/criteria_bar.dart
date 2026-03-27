@@ -29,12 +29,12 @@ class RecipeCriteriaBar extends StatelessWidget {
                 child: Chip(
                   label: Text(
                     c,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurface),
                   ),
-                  backgroundColor: Colors.grey.shade100,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withAlpha(150)),
                   ),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
