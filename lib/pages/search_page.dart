@@ -1,6 +1,6 @@
+import 'package:am_i_cooked/pages/recipes_page.dart';
 import 'package:flutter/material.dart';
 import 'package:am_i_cooked/components/multi_select_pill_dropdown.dart';
-import 'package:am_i_cooked/components/recipe_card.dart';
 import 'package:am_i_cooked/data/search_data.dart';
 
 import '../components/recipe_container.dart';
@@ -33,6 +33,23 @@ class _SearchPageState extends State<SearchPage> {
         setState(() {
           _bookmarks[key] = !(_bookmarks[key] ?? true);
         });
+      },
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => RecipesPage(
+              recipeTitle: "Poulet Roti",
+              imagePath:
+                  "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+              criteria: ['Végétarien', 'Rapide', '< 30 min'],
+              author: 'Chef Jean',
+              prepTime: 15,
+              cookTime: 45,
+              servings: 4,
+              difficulty: 'Facile',
+            ),
+          ),
+        );
       },
     );
   });
@@ -249,7 +266,22 @@ class _SearchPageState extends State<SearchPage> {
                           setState(() {
                             _bookmarks[key] = !(_bookmarks[key] ?? true);
                           });
-                        },
+                        }, onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => RecipesPage(
+                              recipeTitle: "Poulet Roti",
+                              imagePath: "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+                              criteria: ['Végétarien', 'Rapide', '< 30 min'],
+                              author: 'Chef Jean',
+                              prepTime: 15,
+                              cookTime: 45,
+                              servings: 4,
+                              difficulty: 'Facile',
+                            ),
+                          ),
+                        );
+                      },
                       ),
                     );
                   },
