@@ -11,6 +11,6 @@ ThemeData darkTheme = ThemeData(
     onPrimaryContainer: Color(0xFFeaddff),
     secondaryContainer: Color(0xFF332d41),
     surfaceContainerHigh: Color(0xFF2b2930),
-    tertiaryContainer: Color(0xff651baa),
+    tertiaryContainer: Color(0xff3c334c),
   ),
 );
