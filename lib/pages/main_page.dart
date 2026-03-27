@@ -32,6 +32,7 @@ class _MainPageState extends State<MainPage> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => RecipesPage(
+                heroTag: key,
                 recipeTitle: recipeTitle,
                 imagePath: imagePath,
                 criteria: ['Végétarien', 'Rapide', '< 30 min'],
