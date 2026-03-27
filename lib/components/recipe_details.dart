@@ -24,11 +24,11 @@ class RecipeDetails extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.secondaryContainer,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(20),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -53,7 +53,7 @@ class RecipeDetails extends StatelessWidget {
                 'Par $author',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -66,16 +66,19 @@ class RecipeDetails extends StatelessWidget {
                 Icons.timer_outlined,
                 '$prepTime min',
                 'Préparation',
+                context,
               ),
               _buildInfoColumn(
                 Icons.local_fire_department_outlined,
                 '$cookTime min',
                 'Cuisson',
+                context,
               ),
               _buildInfoColumn(
                 Icons.people_outline,
                 '$servings pers.',
                 'Portions',
+                context
               ),
             ],
           ),
@@ -99,10 +102,10 @@ class RecipeDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoColumn(IconData icon, String value, String label) {
+  Widget _buildInfoColumn(IconData icon, String value, String label, BuildContext context) {
     return Column(
       children: [
-        Icon(icon, size: 24, color: Colors.deepPurple),
+        Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
         SizedBox(height: 4),
         Text(
           value,
@@ -115,7 +118,7 @@ class RecipeDetails extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
