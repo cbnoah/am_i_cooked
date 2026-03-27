@@ -8,8 +8,7 @@ class RecipeContainer extends StatefulWidget {
   final String recipePageLink;
   final VoidCallback? onBookmarkChanged;
   final String heroTag;
-
-  //final Function(bool)? onBookmarkChanged;
+  final VoidCallback onTap;
 
   const RecipeContainer({
     super.key,
@@ -20,7 +19,7 @@ class RecipeContainer extends StatefulWidget {
     this.onBookmarkChanged,
     required this.heroTag,
     required this.recipePageLink,
-    // required this.onBookmarkChanged,
+    required this.onTap,
   });
 
   @override
@@ -47,9 +46,7 @@ class _RecipeContainerState extends State<RecipeContainer> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => Placeholder())),
+      onTap: widget.onTap,
       child: Hero(
         tag: widget.heroTag,
         child: Container(
