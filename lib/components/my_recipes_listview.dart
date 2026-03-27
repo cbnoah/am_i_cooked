@@ -94,22 +94,25 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
                           setState(() {
                             _bookmarks[key] = !(_bookmarks[key] ?? true);
                           });
-                        }, onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => RecipesPage(
-                              recipeTitle: "Poulet Roti",
-                              imagePath: "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
-                              criteria: ['Végétarien', 'Rapide', '< 30 min'],
-                              author: 'Chef Jean',
-                              prepTime: 15,
-                              cookTime: 45,
-                              servings: 4,
-                              difficulty: 'Facile',
+                        },
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => RecipesPage(
+                                recipeTitle: "Poulet Roti",
+                                imagePath:
+                                    "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+                                criteria: ['Végétarien', 'Rapide', '< 30 min'],
+                                author: 'Chef Jean',
+                                prepTime: 15,
+                                cookTime: 45,
+                                servings: 4,
+                                difficulty: 'Facile',
+                                heroTag: key,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
                       ),
                     );
                   },
