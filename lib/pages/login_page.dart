@@ -12,17 +12,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
 
-  static const Color bgColor = Color(0xFFF3F2F7);
-  static const Color cardColor = Colors.white;
-  static const Color primaryColor = Color(0xFF6F46D9);
-  static const Color textDark = Color(0xFF111111);
-  static const Color textMuted = Color(0xFF6F6A78);
-  static const Color dividerColor = Color(0xFFE2DEE8);
-
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: cs.surfaceContainerHigh,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -35,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE7E6EA),
+                    color: cs.secondaryContainer,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Image.asset(
@@ -48,11 +43,11 @@ class _LoginPageState extends State<LoginPage> {
 
                 Text(
                   'Am I Cooked ?',
-                  style: const TextStyle(
-                    fontFamily: "bbh_sans_hegarty",
+                  style: TextStyle(
+                    fontFamily: 'bbh_sans_hegarty',
                     fontSize: 30,
                     fontWeight: FontWeight.w700,
-                    color: textDark,
+                    color: cs.onSurface,
                   ),
                 ),
 
@@ -60,11 +55,11 @@ class _LoginPageState extends State<LoginPage> {
 
                 Text(
                   'Votre assistant culinaire intelligent',
-                  style: const TextStyle(
-                    fontFamily: "Nunito",
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: textMuted,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
 
@@ -77,13 +72,13 @@ class _LoginPageState extends State<LoginPage> {
                     vertical: 28,
                   ),
                   decoration: BoxDecoration(
-                    color: cardColor,
+                    color: cs.surface,
                     borderRadius: BorderRadius.circular(32),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label('EMAIL OR USERNAME'),
+                      _label(context, 'EMAIL OR USERNAME'),
                       const SizedBox(height: 14),
 
                       const LoginTextField(
@@ -93,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       const SizedBox(height: 28),
 
-                      _label('PASSWORD'),
+                      _label(context, 'PASSWORD'),
                       const SizedBox(height: 14),
 
                       LoginTextField(
@@ -110,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                             obscurePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: const Color(0xFF8A8592),
+                            color: cs.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -123,9 +118,9 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () {},
                           child: Text(
                             'Forgot Password?',
-                            style: const TextStyle(
-                              fontFamily: "Nunito",
-                              color: primaryColor,
+                            style: TextStyle(
+                              fontFamily: 'Nunito',
+                              color: cs.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -140,16 +135,16 @@ class _LoginPageState extends State<LoginPage> {
                         child: ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
+                            backgroundColor: cs.primary,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Se connecter',
-                            style: const TextStyle(
-                              fontFamily: "Nunito",
+                            style: TextStyle(
+                              fontFamily: 'Nunito',
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -162,45 +157,43 @@ class _LoginPageState extends State<LoginPage> {
 
                       Row(
                         children: [
-                          const Expanded(child: Divider(color: dividerColor)),
+                          Expanded(child: Divider(color: cs.outline)),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               'OU SE CONNECTER AVEC',
-                              style: const TextStyle(
-                                fontFamily: "Nunito",
+                              style: TextStyle(
+                                fontFamily: 'Nunito',
                                 fontSize: 12,
-                                color: textMuted,
+                                color: cs.onSurfaceVariant,
                                 letterSpacing: 1.5,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
-                          const Expanded(child: Divider(color: dividerColor)),
+                          Expanded(child: Divider(color: cs.outline)),
                         ],
                       ),
 
                       const SizedBox(height: 24),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SocialLoginButton(
-                          label: 'Google',
-                          onTap: () {},
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SocialLoginButton(
+                              label: 'Google',
+                              onTap: () {},
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: SocialLoginButton(
+                              label: 'Apple',
+                              onTap: () {},
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: SocialLoginButton(
-                          label: "Apple",
-                          onTap: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-
-
                     ],
                   ),
                 ),
@@ -212,9 +205,9 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       'Pas de compte ? ',
-                      style: const TextStyle(
-                        fontFamily: "Nunito",
-                        color: textMuted,
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
+                        color: cs.onSurfaceVariant,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                       ),
@@ -223,9 +216,9 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () {},
                       child: Text(
                         "S'inscrire",
-                        style: const TextStyle(
-                          fontFamily: "Nunito",
-                          color: primaryColor,
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          color: cs.primary,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -241,14 +234,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _label(String text) {
+  Widget _label(BuildContext context, String text) {
+    final cs = Theme.of(context).colorScheme;
+
     return Text(
       text,
-      style: const TextStyle(
-        fontFamily: "Nunito",
+      style: TextStyle(
+        fontFamily: 'Nunito',
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: textDark,
+        color: cs.onSurface,
         letterSpacing: 1.0,
       ),
     );
