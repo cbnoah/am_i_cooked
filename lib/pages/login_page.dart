@@ -32,16 +32,15 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16),
 
                 Container(
-                  width: 110,
-                  height: 110,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     color: const Color(0xFFE7E6EA),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Icon(
-                    Icons.restaurant_menu_rounded,
-                    size: 56,
-                    color: Colors.black,
+                  child: Image.asset(
+                    'assets/fonts/image/logo.png',
+                    fit: BoxFit.fill,
                   ),
                 ),
 
