@@ -49,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'Am I Cooked ?',
                   style: const TextStyle(
+                    fontFamily: "bbh_sans_hegarty",
                     fontSize: 30,
                     fontWeight: FontWeight.w700,
                     color: textDark,
@@ -60,7 +61,9 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'Votre assistant culinaire intelligent',
                   style: const TextStyle(
+                    fontFamily: "Nunito",
                     fontSize: 14,
+                    fontWeight: FontWeight.w500,
                     color: textMuted,
                   ),
                 ),
@@ -121,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'Forgot Password?',
                             style: const TextStyle(
+                              fontFamily: "Nunito",
                               color: primaryColor,
                               fontWeight: FontWeight.w600,
                             ),
@@ -145,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'Se connecter',
                             style: const TextStyle(
+                              fontFamily: "Nunito",
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -163,10 +168,11 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text(
                               'OU SE CONNECTER AVEC',
                               style: const TextStyle(
+                                fontFamily: "Nunito",
                                 fontSize: 12,
                                 color: textMuted,
                                 letterSpacing: 1.5,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
@@ -207,8 +213,10 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       'Pas de compte ? ',
                       style: const TextStyle(
+                        fontFamily: "Nunito",
                         color: textMuted,
                         fontSize: 14,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                     GestureDetector(
@@ -216,6 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text(
                         "S'inscrire",
                         style: const TextStyle(
+                          fontFamily: "Nunito",
                           color: primaryColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
@@ -236,6 +245,7 @@ class _LoginPageState extends State<LoginPage> {
     return Text(
       text,
       style: const TextStyle(
+        fontFamily: "Nunito",
         fontSize: 13,
         fontWeight: FontWeight.w600,
         color: textDark,
