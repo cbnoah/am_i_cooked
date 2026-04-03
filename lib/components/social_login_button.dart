@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 class SocialLoginButton extends StatelessWidget {
-  static const String _googleLogoAsset = 'assets/fonts/image/google_logo.png';
-
   final String label;
   final VoidCallback onTap;
 
@@ -13,37 +11,7 @@ class SocialLoginButton extends StatelessWidget {
   });
 
   bool get isGoogle => label.toLowerCase() == 'google';
-
-  Widget _buildGoogleBadge(Color color) {
-    return SizedBox(
-      width: 22,
-      height: 22,
-      child: Image.asset(
-        _googleLogoAsset,
-        fit: BoxFit.contain,
-        color: color,
-        colorBlendMode: BlendMode.srcIn,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: color, width: 1.6),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              'G',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: color,
-                height: 1,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+  bool get isApple => label.toLowerCase() == 'apple';
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +24,7 @@ class SocialLoginButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           backgroundColor: colorScheme.surface,
           side: BorderSide(
-            color: colorScheme.onSurface.withValues(alpha: 0.30),
+            color: colorScheme.onSurface.withOpacity(0.22),
             width: 1.2,
           ),
           shape: RoundedRectangleBorder(
@@ -68,9 +36,43 @@ class SocialLoginButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isGoogle) ...[
-              _buildGoogleBadge(colorScheme.onSurface),
+              Image.asset(
+                'assets/fonts/image/google_logo.png',
+                width: 22,
+                height: 22,
+                fit: BoxFit.contain,
+                color: colorScheme.onSurface,
+                colorBlendMode: BlendMode.srcIn,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.g_mobiledata_rounded,
+                    size: 24,
+                    color: colorScheme.onSurface,
+                  );
+                },
+              ),
               const SizedBox(width: 10),
             ],
+
+            if (isApple) ...[
+              Image.asset(
+                'assets/fonts/image/apple.png',
+                width: 20,
+                height: 20,
+                fit: BoxFit.contain,
+                color: colorScheme.onSurface,
+                colorBlendMode: BlendMode.srcIn,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.apple,
+                    size: 22,
+                    color: colorScheme.onSurface,
+                  );
+                },
+              ),
+              const SizedBox(width: 10),
+            ],
+
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
