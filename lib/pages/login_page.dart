@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/login_text_field.dart';
 import '../components/social_login_button.dart';
+import 'register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -213,7 +214,14 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SignupPage(),
+                          ),
+                        );
+                      },
                       child: Text(
                         "S'inscrire",
                         style: TextStyle(
