@@ -22,36 +22,33 @@ class LoginTextField extends StatelessWidget {
     this.readOnly = false,
   });
 
-  static const Color inputBg = Color(0xFFF1EEF6);
-  static const Color primaryColor = Color(0xFF6F46D9);
-  static const Color textDark = Color(0xFF111111);
-  static const Color iconMuted = Color(0xFF8A8592);
-
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return TextField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       onTap: onTap,
       readOnly: readOnly,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
-        color: textDark,
+        color: cs.onSurface,
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: inputBg,
+        fillColor: cs.surfaceContainerHigh,
         hintText: hint,
-        hintStyle: const TextStyle(
-          color: iconMuted,
+        hintStyle: TextStyle(
+          color: cs.onSurfaceVariant,
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
         prefixIcon: Icon(
           prefixIcon,
-          color: iconMuted,
+          color: cs.onSurfaceVariant,
           size: 22,
         ),
         suffixIcon: suffixIcon,
@@ -69,8 +66,8 @@ class LoginTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(
-            color: primaryColor,
+          borderSide: BorderSide(
+            color: cs.primary,
             width: 1.2,
           ),
         ),
