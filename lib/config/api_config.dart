@@ -22,6 +22,8 @@ class ApiConfig {
   static String getRecipeUrl(int recipeId) => "$baseUrl/recipes/$recipeId";
 
   // Endpoints - Authentication
-  static String getLoginUrl() => "$baseUrl/login";
-  static String getRegisterUrl() => "$baseUrl/users/";
+  static String getLoginUrl() => "$baseUrl/users/login";
+  static String getRefreshUrl() => "$baseUrl/users/refresh";
+  static String getLogoutUrl() => "$baseUrl/users/logout";
+  static String getRegisterUrl() => "$baseUrl/users";
 }
