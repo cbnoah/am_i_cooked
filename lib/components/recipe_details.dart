@@ -1,12 +1,45 @@
 import 'package:flutter/material.dart';
 
 class RecipeDetails extends StatelessWidget {
+
+
+  void _showIngredientsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Ingrédients'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: ingredient.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(ingredient[index]),
+                  leading: const Icon(Icons.check_circle_outline),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final String recipeName;
   final String author;
   final int prepTime;
   final int cookTime;
   final int servings;
   final String difficulty;
+  final List<String> ingredient;
+
 
   const RecipeDetails({
     super.key,
@@ -16,6 +49,8 @@ class RecipeDetails extends StatelessWidget {
     required this.cookTime,
     required this.servings,
     required this.difficulty,
+    required this.ingredient,
+
   });
 
   @override
@@ -94,9 +129,20 @@ class RecipeDetails extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showIngredientsDialog(context),
+              child: const Text('Voir les ingrédients'),
+            ),
+          ),
         ],
       ),
+
+
     );
+
   }
 
   Widget _buildInfoColumn(IconData icon, String value, String label) {
