@@ -128,10 +128,9 @@ class AuthService {
         }),
       );
 
-      if (response.statusCode == 200) {
-        final result = response.data; // Ensure this matches your API response
-        final UserModel user = UserModel.fromJson(result);
-        await login(email, password);
+      final status = response.statusCode ?? 0;
+      if (status >= 200 && status < 300) {
+        return await login(email, password);
       }
     } catch (e) {
       if (kDebugMode) {
