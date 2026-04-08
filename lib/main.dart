@@ -1,6 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/pages/main_page.dart';
-import 'package:am_i_cooked/pages/recipes_page.dart';
 import 'package:am_i_cooked/theme/dark_theme_data.dart';
 import 'package:am_i_cooked/theme/light_theme_data.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
     return AdaptiveTheme(
       initial: AdaptiveThemeMode.system,
       light: lightTheme,
@@ -23,9 +23,6 @@ class MyApp extends StatelessWidget {
         theme: light,
         darkTheme: dark,
         home: MainPage(),
-        routes: {
-          '/recipes': (context) => const RecipesPage(),
-        },
       ),
     );
   }

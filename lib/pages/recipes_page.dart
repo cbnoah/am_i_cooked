@@ -3,6 +3,7 @@ import '../components/criteria_bar.dart';
 import '../components/recipe_details.dart';
 
 class RecipesPage extends StatelessWidget {
+  final String heroTag;
   final String recipeTitle;
   final String imagePath;
   final List<String> criteria;
@@ -24,6 +25,7 @@ class RecipesPage extends StatelessWidget {
     this.servings = 4,
     this.difficulty = 'Facile',
     this.ingredient = const ['Poulet', 'Oignon', 'Sel', 'Poivre'],
+    required this.heroTag,
   });
 
   @override
@@ -40,11 +42,14 @@ class RecipesPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              imagePath,
-              height: 250,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Hero(
+              tag: heroTag,
+              child: Image.network(
+                imagePath,
+                height: 250,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(height: 16),
             RecipeCriteriaBar(criteria: criteria),

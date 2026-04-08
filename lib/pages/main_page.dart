@@ -26,13 +26,13 @@ class _MainPageState extends State<MainPage> {
         isBookmarked: _bookmarks[key] ?? true,
         showBookmarkIcon: true,
         recipeTitle: 'Poulet Roti',
-        recipePage: RecipesPage(),
         recipePageLink: '/recipe/$key',
         heroTag: key,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => RecipesPage(
+                heroTag: key,
                 recipeTitle: recipeTitle,
                 imagePath: imagePath,
                 criteria: ['Végétarien', 'Rapide', '< 30 min'],
@@ -45,10 +45,9 @@ class _MainPageState extends State<MainPage> {
             ),
           );
         },
-        onBookmarkChanged: (isBookmarked) {
         onBookmarkChanged: () {
           setState(() {
-            _bookmarks[key] = isBookmarked;
+            _bookmarks[key] = !(_bookmarks[key] ?? true);
           });
         },
       );
@@ -155,13 +154,6 @@ class _MainPageState extends State<MainPage> {
                   children: _buildTestListForCarousel('trends'),
                 ),
               ),
-              FilledButton(onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => RecipesPage(),
-                  ),
-                );
-              }, child: Text("Recette test") ),
             ],
           ),
         ),
