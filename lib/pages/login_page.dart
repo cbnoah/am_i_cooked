@@ -1,3 +1,5 @@
+import 'package:am_i_cooked/service/auth_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../components/login_text_field.dart';
 import '../components/social_login_button.dart';
@@ -12,6 +14,18 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final Dio _dio = Dio();
+  late final AuthService _authService = AuthService(_dio);
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +93,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label(context, 'EMAIL OU NOM D\'UTILISATEUR'),
+                      _label(context, 'EMAIL'),
                       const SizedBox(height: 14),
 
-                      const LoginTextField(
+                      LoginTextField(
                         hint: 'chef@exemple.com',
                         prefixIcon: Icons.alternate_email_rounded,
+                        controller: _emailController,
                       ),
 
                       const SizedBox(height: 28),
@@ -94,6 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       LoginTextField(
                         hint: '••••••••',
+                        controller: _passwordController,
                         prefixIcon: Icons.lock_rounded,
                         obscureText: obscurePassword,
                         suffixIcon: IconButton(
@@ -134,7 +150,17 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 62,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (_emailController.text != "" &&
+                                _passwordController.text != "") {
+                              _authService.login(
+                                _emailController.text,
+                                _passwordController.text,
+                              );
+                            } else {
+                              print("missing attribute");
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
                             elevation: 0,
@@ -217,9 +243,7 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => const SignupPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const SignupPage()),
                         );
                       },
                       child: Text(
