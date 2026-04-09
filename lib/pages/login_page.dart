@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label(context, 'EMAIL OR USERNAME'),
+                      _label(context, 'EMAIL OU NOM D\'UTILISATEUR'),
                       const SizedBox(height: 14),
 
                       const LoginTextField(
@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       const SizedBox(height: 28),
 
-                      _label(context, 'PASSWORD'),
+                      _label(context, 'MOT DE PASSE'),
                       const SizedBox(height: 14),
 
                       LoginTextField(
@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: TextButton(
                           onPressed: () {},
                           child: Text(
-                            'Forgot Password?',
+                            'Mot de passe oubliée?',
                             style: TextStyle(
                               fontFamily: 'Nunito',
                               color: cs.primary,
