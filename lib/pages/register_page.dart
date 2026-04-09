@@ -1,9 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../components/login_text_field.dart';
 import '../components/profil_picture_container.dart';
 import '../components/social_login_button.dart';
+import '../service/auth_service.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -14,21 +16,14 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   bool obscurePassword = true;
-  String profileImagePath = '';
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-
-    if (image != null) {
-      setState(() {
-        profileImagePath = image.path;
-      });
-    }
-  }
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final Dio _dio = Dio();
+  late final AuthService _authService = AuthService(_dio);
 
   @override
   Widget build(BuildContext context) {
@@ -96,23 +91,12 @@ class _SignupPageState extends State<SignupPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(
-                        child: ProfilePictureContainer(
-                          pathImage: profileImagePath.isEmpty
-                              ? 'https://via.placeholder.com/300x300.png?text=Profile'
-                              : profileImagePath,
-                          isEditIconVisible: true,
-                          onEditPressed: _pickImage,
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      _label(context, 'PSEUDO'),
+                      _label(context, 'NOM D\'UTILISATEUR'),
                       const SizedBox(height: 14),
 
-                      const LoginTextField(
+                      LoginTextField(
                         hint: 'jean_dupont',
+                        controller: _usernameController,
                         prefixIcon: Icons.alternate_email_rounded,
                       ),
 
@@ -121,8 +105,9 @@ class _SignupPageState extends State<SignupPage> {
                       _label(context, 'EMAIL'),
                       const SizedBox(height: 14),
 
-                      const LoginTextField(
+                      LoginTextField(
                         hint: 'chef@exemple.com',
+                        controller: _emailController,
                         prefixIcon: Icons.mail_outline_rounded,
                       ),
 
@@ -133,6 +118,31 @@ class _SignupPageState extends State<SignupPage> {
 
                       LoginTextField(
                         hint: '••••••••',
+                        controller: _passwordController,
+                        prefixIcon: Icons.lock_rounded,
+                        obscureText: obscurePassword,
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      _label(context, 'CONFIRMEZ VOTRE MOT DE PASSE'),
+                      const SizedBox(height: 14),
+
+                      LoginTextField(
+                        hint: '••••••••',
+                        controller: _confirmPasswordController,
                         prefixIcon: Icons.lock_rounded,
                         obscureText: obscurePassword,
                         suffixIcon: IconButton(
@@ -156,7 +166,24 @@ class _SignupPageState extends State<SignupPage> {
                         width: double.infinity,
                         height: 62,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            if (_emailController.text != "" &&
+                                _usernameController.text != "" &&
+                                _passwordController.text != "" &&
+                                _passwordController.text ==
+                                    _confirmPasswordController.text) {
+                              final bool result = await _authService.register(
+                                _usernameController.text,
+                                _emailController.text,
+                                _passwordController.text,
+                              );
+                              if (result && context.mounted) {
+                                Navigator.of(context).pop();
+                              }
+                            } else {
+                              print("missing arguments");
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
                             elevation: 0,
