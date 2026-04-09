@@ -1,17 +1,34 @@
 import 'package:flutter/material.dart';
-import '../components/login_text_field.dart';
-import '../components/social_login_button.dart';
-import 'register_page.dart';
+import 'package:image_picker/image_picker.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../components/login_text_field.dart';
+import '../components/profil_picture_container.dart';
+import '../components/social_login_button.dart';
+
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   bool obscurePassword = true;
+  String profileImagePath = '';
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      setState(() {
+        profileImagePath = image.path;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 6),
 
                 Text(
-                  'Votre assistant culinaire intelligent',
+                  'Créez votre compte culinaire',
                   style: TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 14,
@@ -79,15 +96,37 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label(context, 'EMAIL OR USERNAME'),
+                      Center(
+                        child: ProfilePictureContainer(
+                          pathImage: profileImagePath.isEmpty
+                              ? 'https://via.placeholder.com/300x300.png?text=Profile'
+                              : profileImagePath,
+                          isEditIconVisible: true,
+                          onEditPressed: _pickImage,
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      _label(context, 'USERNAME'),
+                      const SizedBox(height: 14),
+
+                      const LoginTextField(
+                        hint: 'jean_dupont',
+                        prefixIcon: Icons.alternate_email_rounded,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      _label(context, 'EMAIL'),
                       const SizedBox(height: 14),
 
                       const LoginTextField(
                         hint: 'chef@exemple.com',
-                        prefixIcon: Icons.alternate_email_rounded,
+                        prefixIcon: Icons.mail_outline_rounded,
                       ),
 
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 24),
 
                       _label(context, 'PASSWORD'),
                       const SizedBox(height: 14),
@@ -111,23 +150,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
-
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontFamily: 'Nunito',
-                              color: cs.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-
                       const SizedBox(height: 18),
 
                       SizedBox(
@@ -143,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           child: const Text(
-                            'Se connecter',
+                            "S'inscrire",
                             style: TextStyle(
                               fontFamily: 'Nunito',
                               fontSize: 18,
@@ -162,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
-                              'OU SE CONNECTER AVEC',
+                              'OU S’INSCRIRE AVEC',
                               style: TextStyle(
                                 fontFamily: 'Nunito',
                                 fontSize: 12,
@@ -205,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Pas de compte ? ',
+                      'Déjà un compte ? ',
                       style: TextStyle(
                         fontFamily: 'Nunito',
                         color: cs.onSurfaceVariant,
@@ -215,15 +237,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const SignupPage(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                       child: Text(
-                        "S'inscrire",
+                        'Se connecter',
                         style: TextStyle(
                           fontFamily: 'Nunito',
                           color: cs.primary,
