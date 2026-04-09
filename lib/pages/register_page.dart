@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../components/login_text_field.dart';
+import '../components/profil_picture_container.dart';
 import '../components/social_login_button.dart';
 
 class SignupPage extends StatefulWidget {
@@ -11,6 +14,21 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   bool obscurePassword = true;
+  String profileImagePath = '';
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      setState(() {
+        profileImagePath = image.path;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,25 +96,17 @@ class _SignupPageState extends State<SignupPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label(context, 'FIRST NAME'),
-                      const SizedBox(height: 14),
-
-                      const LoginTextField(
-                        hint: 'Jean',
-                        prefixIcon: Icons.person_outline,
+                      Center(
+                        child: ProfilePictureContainer(
+                          pathImage: profileImagePath.isEmpty
+                              ? 'https://via.placeholder.com/300x300.png?text=Profile'
+                              : profileImagePath,
+                          isEditIconVisible: true,
+                          onEditPressed: _pickImage,
+                        ),
                       ),
 
-                      const SizedBox(height: 24),
-
-                      _label(context, 'LAST NAME'),
-                      const SizedBox(height: 14),
-
-                      const LoginTextField(
-                        hint: 'Dupont',
-                        prefixIcon: Icons.person_outline,
-                      ),
-
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
 
                       _label(context, 'USERNAME'),
                       const SizedBox(height: 14),
