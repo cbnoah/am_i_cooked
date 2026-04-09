@@ -108,7 +108,7 @@ class _SignupPageState extends State<SignupPage> {
 
                       const SizedBox(height: 28),
 
-                      _label(context, 'USERNAME'),
+                      _label(context, 'PSEUDO'),
                       const SizedBox(height: 14),
 
                       const LoginTextField(
@@ -128,7 +128,7 @@ class _SignupPageState extends State<SignupPage> {
 
                       const SizedBox(height: 24),
 
-                      _label(context, 'PASSWORD'),
+                      _label(context, 'MOT DE PASSE'),
                       const SizedBox(height: 14),
 
                       LoginTextField(
