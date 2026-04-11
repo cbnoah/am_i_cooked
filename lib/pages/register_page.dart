@@ -165,24 +165,34 @@ class _SignupPageState extends State<SignupPage> {
                         height: 62,
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (_emailController.text != "" &&
-                                _usernameController.text != "" &&
-                                _passwordController.text != "" &&
-                                _passwordController.text ==
-                                    _confirmPasswordController.text) {
-                              final bool result = await _authService.register(
-                                _usernameController.text,
-                                _emailController.text,
-                                _passwordController.text,
-                              );
-                              if (result && context.mounted) {
-                                Navigator.of(context).pop();
+                            try {
+                              if (_emailController.text != "" &&
+                                  _usernameController.text != "" &&
+                                  _passwordController.text != "" &&
+                                  _passwordController.text ==
+                                      _confirmPasswordController.text) {
+                                final bool result = await _authService.register(
+                                  _usernameController.text,
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                                if (result && context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Veuillez entrer tout les éléments",
+                                    ),
+                                  ),
+                                );
                               }
-                            } else {
+                            } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    "Veuillez entrer tout les éléments",
+                                    e.toString(),
                                   ),
                                 ),
                               );
