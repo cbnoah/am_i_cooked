@@ -14,6 +14,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
+  bool _isAuthenticating = false;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -25,6 +26,53 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _onAuthClicked(String email, String password) async {
+    if (_isAuthenticating) {
+      return;
+    }
+
+    if (email.trim().isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez entrer tout les éléments'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isAuthenticating = true;
+    });
+
+    try {
+      final bool result = await _authService.login(email, password);
+
+      if (!result && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Identifiants invalides ou réponse serveur incomplète'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().isEmpty
+                ? 'Une erreur est survenue pendant la connexion'
+                : e.toString()),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
+    }
   }
 
   @override
@@ -150,33 +198,14 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 62,
                         child: ElevatedButton(
-                          onPressed: () {
-                            try {
-                              if (_emailController.text != "" &&
-                                  _passwordController.text != "") {
-                                _authService.login(
-                                  _emailController.text,
-                                  _passwordController.text,
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Veuillez entrer tout les éléments",
-                                    ),
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    e.toString(),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
+                          onPressed: _isAuthenticating
+                              ? null
+                              : () {
+                                  _onAuthClicked(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                  );
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
                             elevation: 0,
@@ -184,15 +213,26 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          child: const Text(
-                            'Se connecter',
-                            style: TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                          child: _isAuthenticating
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Se connecter',
+                                  style: TextStyle(
+                                    fontFamily: 'Nunito',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
 
