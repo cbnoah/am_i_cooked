@@ -14,6 +14,7 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   bool obscurePassword = true;
+  bool _isAuthenticating = false;
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -22,6 +23,83 @@ class _SignupPageState extends State<SignupPage> {
       TextEditingController();
   final Dio _dio = Dio();
   late final AuthService _authService = AuthService(_dio);
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onRegisterClicked() async {
+    if (_isAuthenticating) {
+      return;
+    }
+
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (username.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty ||
+        password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez entrer tout les éléments'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isAuthenticating = true;
+    });
+
+    try {
+      final bool result = await _authService.register(
+        username,
+        email,
+        password,
+      );
+
+      if (!mounted) return;
+
+      if (result) {
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Inscription impossible ou réponse serveur incomplète',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString().isEmpty
+                  ? 'Une erreur est survenue pendant l’inscription'
+                  : e.toString(),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +114,6 @@ class _SignupPageState extends State<SignupPage> {
             child: Column(
               children: [
                 const SizedBox(height: 16),
-
                 Container(
                   width: 100,
                   height: 100,
@@ -49,9 +126,7 @@ class _SignupPageState extends State<SignupPage> {
                     fit: BoxFit.fill,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Text(
                   'Am I Cooked ?',
                   style: TextStyle(
@@ -61,9 +136,7 @@ class _SignupPageState extends State<SignupPage> {
                     color: cs.onSurface,
                   ),
                 ),
-
                 const SizedBox(height: 6),
-
                 Text(
                   'Créez votre compte culinaire',
                   style: TextStyle(
@@ -73,9 +146,7 @@ class _SignupPageState extends State<SignupPage> {
                     color: cs.onSurfaceVariant,
                   ),
                 ),
-
                 const SizedBox(height: 34),
-
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -91,29 +162,22 @@ class _SignupPageState extends State<SignupPage> {
                     children: [
                       _label(context, 'NOM D\'UTILISATEUR'),
                       const SizedBox(height: 14),
-
                       LoginTextField(
                         hint: 'jean_dupont',
                         controller: _usernameController,
                         prefixIcon: Icons.alternate_email_rounded,
                       ),
-
                       const SizedBox(height: 24),
-
                       _label(context, 'EMAIL'),
                       const SizedBox(height: 14),
-
                       LoginTextField(
                         hint: 'chef@exemple.com',
                         controller: _emailController,
                         prefixIcon: Icons.mail_outline_rounded,
                       ),
-
                       const SizedBox(height: 24),
-
                       _label(context, 'MOT DE PASSE'),
                       const SizedBox(height: 14),
-
                       LoginTextField(
                         hint: '••••••••',
                         controller: _passwordController,
@@ -134,10 +198,8 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
                       _label(context, 'CONFIRMEZ VOTRE MOT DE PASSE'),
                       const SizedBox(height: 14),
-
                       LoginTextField(
                         hint: '••••••••',
                         controller: _confirmPasswordController,
@@ -157,47 +219,13 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 18),
-
                       SizedBox(
                         width: double.infinity,
                         height: 62,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              if (_emailController.text != "" &&
-                                  _usernameController.text != "" &&
-                                  _passwordController.text != "" &&
-                                  _passwordController.text ==
-                                      _confirmPasswordController.text) {
-                                final bool result = await _authService.register(
-                                  _usernameController.text,
-                                  _emailController.text,
-                                  _passwordController.text,
-                                );
-                                if (result && context.mounted) {
-                                  Navigator.of(context).pop();
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Veuillez entrer tout les éléments",
-                                    ),
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    e.toString(),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
+                          onPressed:
+                              _isAuthenticating ? null : _onRegisterClicked,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: cs.primary,
                             elevation: 0,
@@ -205,20 +233,29 @@ class _SignupPageState extends State<SignupPage> {
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          child: const Text(
-                            "S'inscrire",
-                            style: TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                          child: _isAuthenticating
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  "S'inscrire",
+                                  style: TextStyle(
+                                    fontFamily: 'Nunito',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
-
                       const SizedBox(height: 28),
-
                       Row(
                         children: [
                           Expanded(child: Divider(color: cs.outline)),
@@ -238,9 +275,7 @@ class _SignupPageState extends State<SignupPage> {
                           Expanded(child: Divider(color: cs.outline)),
                         ],
                       ),
-
                       const SizedBox(height: 24),
-
                       Row(
                         children: [
                           Expanded(
@@ -261,7 +296,6 @@ class _SignupPageState extends State<SignupPage> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 28),
 
                 Row(
