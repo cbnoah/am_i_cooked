@@ -151,17 +151,27 @@ class _LoginPageState extends State<LoginPage> {
                         height: 62,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (_emailController.text != "" &&
-                                _passwordController.text != "") {
-                              _authService.login(
-                                _emailController.text,
-                                _passwordController.text,
-                              );
-                            } else {
+                            try {
+                              if (_emailController.text != "" &&
+                                  _passwordController.text != "") {
+                                _authService.login(
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Veuillez entrer tout les éléments",
+                                    ),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    "Veuillez entrer tout les éléments",
+                                    e.toString(),
                                   ),
                                 ),
                               );
