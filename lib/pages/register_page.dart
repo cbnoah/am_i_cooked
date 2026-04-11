@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../components/login_text_field.dart';
-import '../components/profil_picture_container.dart';
 import '../components/social_login_button.dart';
 import '../service/auth_service.dart';
 
@@ -181,7 +179,13 @@ class _SignupPageState extends State<SignupPage> {
                                 Navigator.of(context).pop();
                               }
                             } else {
-                              print("missing arguments");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Veuillez entrer tout les éléments",
+                                  ),
+                                ),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(

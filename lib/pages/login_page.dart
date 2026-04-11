@@ -158,7 +158,13 @@ class _LoginPageState extends State<LoginPage> {
                                 _passwordController.text,
                               );
                             } else {
-                              print("missing attribute");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Veuillez entrer tout les éléments",
+                                  ),
+                                ),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(
