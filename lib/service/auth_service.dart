@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:am_i_cooked/config/api_config.dart';
-import 'package:am_i_cooked/models/user_model.dart';
 import 'package:am_i_cooked/service/token_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -67,6 +66,7 @@ class AuthService {
       if (kDebugMode) {
         print('Login error: $e');
       }
+      throw Exception(e.toString());
     }
     return false;
   }
@@ -112,6 +112,7 @@ class AuthService {
       if (kDebugMode) {
         print('Refresh token error: $e');
       }
+      throw Exception(e);
     }
 
     return false;
@@ -136,6 +137,7 @@ class AuthService {
       if (kDebugMode) {
         print('Signup error: $e');
       }
+      throw Exception(e.toString());
     }
     return false;
   }
@@ -156,6 +158,7 @@ class AuthService {
       if (kDebugMode) {
         print('Logout error: $e');
       }
+      throw Exception(e);
     } finally {
       await _tokenService.clearTokens();
     }
