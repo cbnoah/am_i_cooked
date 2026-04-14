@@ -42,23 +42,29 @@ class AuthService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = _responseToMap(response.data);
-        final accessToken = _extractString(data, ['accessToken']);
-        final accessTokenExpiry = _extractDateTime(data, ['accessTokenExpiry']);
-        final refreshToken = _extractString(data, ['refreshToken']);
-        final refreshTokenExpiry = _extractDateTime(data, [
-          'refreshTokenExpiry',
-        ]);
+        final accessToken = _extractString(data, ['accessToken', 'access_token', 'token']);
+        DateTime? accessTokenExpiry = _extractDateTime(data, ['accessTokenExpiry', 'expires_in', 'expiresIn']);
+        final refreshToken = _extractString(data, ['refreshToken', 'refresh_token']);
+        DateTime? refreshTokenExpiry = _extractDateTime(data, ['refreshTokenExpiry', 'refresh_expires_in']);
 
-        if (accessToken != null &&
-            accessTokenExpiry != null &&
-            refreshToken != null &&
-            refreshTokenExpiry != null) {
+        if (accessToken != null) {
+          accessTokenExpiry ??= _extractJwtExpiry(accessToken) ?? DateTime.now().add(const Duration(hours: 1));
+        }
+        
+        if (refreshToken != null) {
+          refreshTokenExpiry ??= _extractJwtExpiry(refreshToken) ?? DateTime.now().add(const Duration(days: 30));
+        }
+
+        if (accessToken != null && refreshToken != null) {
           await _tokenService.saveTokens(
             accessToken: accessToken,
-            accessTokenExpiry: accessTokenExpiry,
+            accessTokenExpiry: accessTokenExpiry!,
             refreshToken: refreshToken,
-            refreshTokenExpiry: refreshTokenExpiry,
+            refreshTokenExpiry: refreshTokenExpiry!,
           );
+          return true;
+        } else if (accessToken != null) {
+          await _tokenService.saveAccessToken(accessToken, accessTokenExpiry);
           return true;
         }
       }
@@ -85,21 +91,21 @@ class AuthService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = _responseToMap(response.data);
-        final newAccessToken = _extractString(data, ['accessToken']);
-        final accessTokenExpiry = _extractDateTime(data, ['accessTokenExpiry']);
-        final newRefreshToken = _extractString(data, ['refreshToken']);
-        final refreshTokenExpiry = _extractDateTime(data, [
-          'refreshTokenExpiry',
-        ]);
+        final newAccessToken = _extractString(data, ['accessToken', 'access_token', 'token']);
+        DateTime? accessTokenExpiry = _extractDateTime(data, ['accessTokenExpiry', 'expires_in', 'expiresIn']);
+        final newRefreshToken = _extractString(data, ['refreshToken', 'refresh_token']);
+        DateTime? refreshTokenExpiry = _extractDateTime(data, ['refreshTokenExpiry', 'refresh_expires_in']);
 
-        if (newAccessToken != null && accessTokenExpiry != null) {
+        if (newAccessToken != null) {
+          accessTokenExpiry ??= _extractJwtExpiry(newAccessToken) ?? DateTime.now().add(const Duration(hours: 1));
+          
           await _tokenService.saveAccessToken(
             newAccessToken,
             accessTokenExpiry,
           );
-          if (newRefreshToken != null &&
-              newRefreshToken.isNotEmpty &&
-              refreshTokenExpiry != null) {
+          
+          if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+            refreshTokenExpiry ??= _extractJwtExpiry(newRefreshToken) ?? DateTime.now().add(const Duration(days: 30));
             await _tokenService.saveRefreshToken(
               newRefreshToken,
               refreshTokenExpiry,
@@ -161,6 +167,23 @@ class AuthService {
       throw Exception(e);
     } finally {
       await _tokenService.clearTokens();
+    }
+  }
+
+  Future<String?> getSessionId() async {
+    try {
+      final token = await _tokenService.getAccessToken();
+      if (token == null || token.isEmpty) return null;
+
+      final payload = parseJwt(token);
+      final id = payload['id'];
+      
+      return id?.toString();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error extracting session ID: $e');
+      }
+      return null;
     }
   }
 
