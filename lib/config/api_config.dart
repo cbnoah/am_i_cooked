@@ -18,6 +18,7 @@ class ApiConfig {
   static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
   
   // Endpoints - Recipes
+  static String getAllRecipesUrl() => "$baseUrl/recipes";
   static String getRecipesUrl(int userId) => "$baseUrl/recipes/user/$userId";
   static String getRecipeUrl(int recipeId) => "$baseUrl/recipes/$recipeId";
 
