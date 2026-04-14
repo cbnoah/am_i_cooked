@@ -7,7 +7,6 @@ class UserModel {
   int? lVL;
   DateTime? createdAt;
   DateTime? updatedAt;
-  String? token;
 
   UserModel({
     this.id,
@@ -18,7 +17,6 @@ class UserModel {
     this.lVL,
     this.createdAt,
     this.updatedAt,
-    this.token,
   });
 
   UserModel.fromJson(Map<String, dynamic> json) {
@@ -28,9 +26,8 @@ class UserModel {
     email = json['email'];
     xP = json['XP'];
     lVL = json['LVL'];
-    createdAt = DateTime.parse(json['created_at']);
-    updatedAt = DateTime.parse(json['updated_at']);
-    token = json['token'];
+    createdAt = _parseDate(json['created_at']);
+    updatedAt = _parseDate(json['updated_at']);
   }
 
   Map<String, dynamic> toJson() {
@@ -41,9 +38,24 @@ class UserModel {
     data['email'] = email;
     data['XP'] = xP;
     data['LVL'] = lVL;
-    data['created_at'] = createdAt.toString();
-    data['updated_at'] = updatedAt;
-    data['token'] = token;
+    data['created_at'] = createdAt?.toIso8601String();
+    data['updated_at'] = updatedAt?.toIso8601String();
     return data;
+  }
+
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+
+    return null;
   }
 }
