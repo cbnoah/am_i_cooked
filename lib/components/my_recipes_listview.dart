@@ -1,8 +1,12 @@
+import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/components/recipe_container.dart';
+import 'package:am_i_cooked/models/recipe_model.dart';
+import 'package:am_i_cooked/pages/recipes_page.dart';
+import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:flutter/material.dart';
-import '../pages/recipes_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyRecipesListview extends StatefulWidget {
+class MyRecipesListview extends ConsumerStatefulWidget {
   final dynamic toggleMyRecipesExpanded;
   final dynamic getMyRecipesExpanded;
 
@@ -13,10 +17,10 @@ class MyRecipesListview extends StatefulWidget {
   });
 
   @override
-  State<MyRecipesListview> createState() => _MyRecipesListviewState();
+  ConsumerState<MyRecipesListview> createState() => _MyRecipesListviewState();
 }
 
-class _MyRecipesListviewState extends State<MyRecipesListview> {
+class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
   void _togleMyRecipesExpanded() {
     widget.toggleMyRecipesExpanded();
   }
@@ -26,9 +30,57 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
   }
 
   final Map<String, bool> _bookmarks = {};
+  static const String _placeholderImageUrl =
+      'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg';
+
+  String _bookmarkKeyFor(RecipeModel recipe, String fallback) {
+    return recipe.id?.toString() ?? recipe.name ?? fallback;
+  }
+
+  String _heroTagFor(RecipeModel recipe, int index) {
+    return 'my-recipes-${recipe.id ?? index}';
+  }
+
+  String _imagePathFor(RecipeModel recipe) {
+    return recipe.idPicture != null
+        ? ApiConfig.getPictureUrl(recipe.idPicture!)
+        : _placeholderImageUrl;
+  }
+
+  Widget _buildRecipeTile(RecipeModel recipe, int index) {
+    final heroTag = _heroTagFor(recipe, index);
+    final bookmarkKey = _bookmarkKeyFor(recipe, heroTag);
+
+    return SizedBox(
+      height: 200,
+      child: RecipeContainer(
+        key: ValueKey(heroTag),
+        path: _imagePathFor(recipe),
+        isBookmarked: _bookmarks[bookmarkKey] ?? true,
+        showBookmarkIcon: true,
+        recipeTitle: recipe.displayName,
+        recipePageLink: '/recipe/$heroTag',
+        heroTag: heroTag,
+        onBookmarkChanged: () {
+          setState(() {
+            _bookmarks[bookmarkKey] = !(_bookmarks[bookmarkKey] ?? true);
+          });
+        },
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => RecipesPage(recipe: recipe, heroTag: heroTag, id: 0,),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final recipesAsync = ref.watch(recipesProvider);
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -71,51 +123,24 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
               style: TextStyle(fontFamily: "bbh_sans_hegarty", fontSize: 22),
             ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: ListView.separated(
-                  scrollDirection: Axis.vertical,
-                  itemCount: 5,
-                  separatorBuilder: (context, index) => SizedBox(height: 20),
-                  itemBuilder: (context, index) {
-                    final key = 'profile-recipe-$index';
-                    return SizedBox(
-                      height: 200,
-                      child: RecipeContainer(
-                        key: ValueKey(key),
-                        path:
-                            "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
-                        isBookmarked: _bookmarks[key] ?? true,
-                        showBookmarkIcon: true,
-                        recipeTitle: 'Poulet Roti',
-                        recipePageLink: '/recipe/$key',
-                        heroTag: key,
-                        onBookmarkChanged: () {
-                          setState(() {
-                            _bookmarks[key] = !(_bookmarks[key] ?? true);
-                          });
-                        },
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => RecipesPage(
-                                recipeTitle: "Poulet Roti",
-                                imagePath:
-                                    "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
-                                criteria: ['Végétarien', 'Rapide', '< 30 min'],
-                                author: 'Chef Jean',
-                                prepTime: 15,
-                                cookTime: 45,
-                                servings: 4,
-                                difficulty: 'Facile',
-                                heroTag: key,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
+              child: recipesAsync.when(
+                data: (recipes) => Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: ListView.separated(
+                    scrollDirection: Axis.vertical,
+                    itemCount: recipes.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 20),
+                    itemBuilder: (context, index) =>
+                        _buildRecipeTile(recipes[index], index),
+                  ),
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stackTrace) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Impossible de charger les recettes : $error'),
+                  ),
                 ),
               ),
             ),
