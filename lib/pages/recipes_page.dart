@@ -13,6 +13,9 @@ class RecipesPage extends StatelessWidget {
   final int servings;
   final String difficulty;
   final List<String> ingredient;
+  final List<String> comment;
+  final List<String> userNameComment;
+
 
   const RecipesPage({
     super.key,
@@ -26,6 +29,8 @@ class RecipesPage extends StatelessWidget {
     this.difficulty = 'Facile',
     this.ingredient = const ['Poulet', 'Oignon', 'Sel', 'Poivre'],
     required this.heroTag,
+    this.comment = const ['Très bon poulet', 'Mashallah','aze','flop plus ratio'],
+    this.userNameComment = const ['Julie', 'Paul','JCVD','SCH']
   });
 
   @override
@@ -62,6 +67,8 @@ class RecipesPage extends StatelessWidget {
               servings: servings,
               difficulty: difficulty,
               ingredient: ingredient,
+              comment: comment,
+              userNameComment: userNameComment,
             ),
           ],
         ),
