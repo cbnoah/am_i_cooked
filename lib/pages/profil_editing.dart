@@ -1,11 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:am_i_cooked/components/profil_picture_container.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:am_i_cooked/config/api_config.dart';
-import 'package:http/http.dart' as http;
 import 'package:am_i_cooked/utils/snack_bar_handler.dart';
+import 'package:am_i_cooked/utils/http_helper.dart';
 
 
 class ProfileEditingPage extends StatefulWidget {
@@ -22,124 +20,80 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
 
   final int _userId = ApiConfig.defaultUserId;
 
+  // Form controllers
+  late final TextEditingController _pseudonymeController;
+  late final TextEditingController _nomUtilisateurController;
+  late final TextEditingController _descriptionController;
+
   @override
   void initState() {
     super.initState();
+    _pseudonymeController = TextEditingController();
+    _nomUtilisateurController = TextEditingController();
+    _descriptionController = TextEditingController();
     _loadUserProfile();
   }
 
+  @override
+  void dispose() {
+    _pseudonymeController.dispose();
+    _nomUtilisateurController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+
   Future<void> _loadUserProfile() async {
-    if (!mounted) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      // 1. Get user data to find profile picture ID
-      final userResponse = await http
-          .get(Uri.parse(ApiConfig.getUserUrl(_userId)))
-          .timeout(const Duration(seconds: 15));
-
-      if (!mounted) return;
-
-      if (userResponse.statusCode == 200) {
-        final userData = jsonDecode(userResponse.body);
-        final pictureId = userData['profile_picture_id'];
-
-        if (pictureId != null) {
-          // 2. Get the picture URL using the picture ID
-          final picResponse = await http
-              .get(Uri.parse('${ApiConfig.baseUrl}/pictures/$pictureId'))
-              .timeout(const Duration(seconds: 15));
-
-          if (!mounted) return;
-
-          if (picResponse.statusCode == 200) {
-            final picData = jsonDecode(picResponse.body);
-            setState(() => _imagePath = picData['url']);
-          }
-        }
-      } else {
-        if (mounted) {
-          showErrorSnackbar('Error: ${userResponse.statusCode}',
-          context);
-        }
-      }
-    } on SocketException catch (e) {
-      if (mounted) {
-        showErrorSnackbar('Network error: ${e.message}',
-        context );
-      }
-      debugPrint('Socket error: $e');
-    } catch (e) {
-      if (mounted) {
-        showErrorSnackbar('Error: $e',
-        context);
-      }
-      debugPrint('Error loading profile : $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    final imageUrl = await HttpHelper.loadUserProfile(
+      _userId,
+      context: context,
+      isMounted: () => mounted,
+    );
+    if (mounted && imageUrl != null) {
+      setState(() => _imagePath = imageUrl);
     }
   }
+
 
   Future<void> _uploadImage(String filePath) async {
-    if (!mounted) return;
-
     setState(() => _isLoading = true);
 
-    try {
-      final uri = Uri.parse(ApiConfig.getUploadUrl(_userId));
-      final request = http.MultipartRequest('POST', uri);
+    final imageUrl = await HttpHelper.uploadUserImage(
+      _userId,
+      filePath,
+      context: context,
+      isMounted: () => mounted,
+    );
 
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'avatar', // must match the name in multerUploadConf.single('avatar')
-          filePath,
-        ),
-      );
-
-      final response = await request.send().timeout(
-        const Duration(seconds: 30),
-      );
-
-      final body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-
-      if (!mounted) return;
-
-      if (response.statusCode == 201) {
-        setState(() => _imagePath = data['url']);
-        if (mounted) {
-          showSuccessSnackbar('Image uploaded with success!',
-          context);
-        }
-      } else {
-        if (mounted) {
-          showErrorSnackbar('Upload error: ${response.statusCode}',
-          context);
-        }
-        debugPrint('Error uploading image : $body');
-      }
-    } on SocketException catch (e) {
-      if (mounted) {
-        showErrorSnackbar('Network error: ${e.message}',
-        context);
-      }
-      debugPrint('Socket error upload: $e');
-    } catch (e) {
-      if (mounted) {
-        showErrorSnackbar('Error: $e',
-        context);
-      }
-      debugPrint('Exception upload : $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    if (mounted) {
+      if (imageUrl != null) setState(() => _imagePath = imageUrl);
+      setState(() => _isLoading = false);
     }
   }
 
+
+  Future<void> _saveProfile() async {
+    if (_pseudonymeController.text.isEmpty ||
+        _nomUtilisateurController.text.isEmpty) {
+      showErrorSnackbar('Veuillez remplir tous les champs', context);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    await HttpHelper.saveUserProfile(
+      _userId,
+      _pseudonymeController.text,
+      _nomUtilisateurController.text,
+      _descriptionController.text,
+      context: context,
+      isMounted: () => mounted,
+    );
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
 
 
   Future<void> _pickImage() async {
@@ -180,6 +134,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
       ),
     );
   }
+
 
   Widget _buildProfileSection() {
     return Column(
@@ -268,6 +223,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                               horizontal: 25.0,
                             ),
                             child: TextField(
+                              controller: _pseudonymeController,
                               decoration: InputDecoration(
                                 label: const Text("Pseudonyme"),
                                 enabledBorder: OutlineInputBorder(
@@ -295,6 +251,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                               horizontal: 25.0,
                             ),
                             child: TextField(
+                              controller: _nomUtilisateurController,
                               decoration: InputDecoration(
                                 label: const Text("Nom d'utilisateur"),
                                 enabledBorder: OutlineInputBorder(
@@ -322,8 +279,9 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                               horizontal: 25.0,
                             ),
                             child: TextField(
+                              controller: _descriptionController,
                               decoration: InputDecoration(
-                                label: const Text("Nom d'utilisateur"),
+                                label: const Text("Description"),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(10),
@@ -351,13 +309,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                       padding: const EdgeInsets.only(top: 100.0),
                       child: Center(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: save profile changes
-                            showSuccessSnackbar(
-                              'Profil mis à jour avec succès!',
-                              context
-                            );
-                          },
+                          onPressed: _isLoading ? null : _saveProfile,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 50.0,
