@@ -186,21 +186,19 @@ class HttpHelper {
     return result['url'] as String?;
   }
 
-  /// Save user profile (pseudonyme, username, description)
+  /// Save user profile (username, email)
   static Future<bool> saveUserProfile(
     int userId,
-    String pseudonyme,
     String username,
-    String description, {
+    String email, {
     required BuildContext context,
     required bool Function() isMounted,
   }) async {
     final result = await safePatch<Map<String, dynamic>>(
       ApiConfig.getUserUrl(userId),
       {
-        'pseudonyme': pseudonyme,
         'username': username,
-        'description': description,
+        'email': email,
       },
       (body) => jsonDecode(body) as Map<String, dynamic>,
       context: context,
