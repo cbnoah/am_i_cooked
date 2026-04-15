@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/nav_bar_switcher.dart';
 import '../components/recipe_container.dart';
+import 'recipes_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,23 +17,37 @@ class _MainPageState extends State<MainPage> {
   List<Widget> _buildTestListForCarousel(String prefix) {
     return List.generate(5, (index) {
       final key = '$prefix-$index';
+      final recipeTitle = 'Poulet Roti';
+      final imagePath =
+          "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg";
       return RecipeContainer(
         key: ValueKey(key),
-        path:
-            "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+        path: imagePath,
         isBookmarked: _bookmarks[key] ?? true,
         showBookmarkIcon: true,
         recipeTitle: 'Poulet Roti',
-        recipePage: Placeholder(),
+        recipePageLink: '/recipe/$key',
         heroTag: key,
         onTap: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => Placeholder()));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => RecipesPage(
+                heroTag: key,
+                recipeTitle: recipeTitle,
+                imagePath: imagePath,
+                criteria: ['Végétarien', 'Rapide', '< 30 min'],
+                author: 'Chef Jean',
+                prepTime: 15,
+                cookTime: 45,
+                servings: 4,
+                difficulty: 'Facile',
+              ),
+            ),
+          );
         },
-        onBookmarkChanged: (isBookmarked) {
+        onBookmarkChanged: () {
           setState(() {
-            _bookmarks[key] = isBookmarked;
+            _bookmarks[key] = !(_bookmarks[key] ?? true);
           });
         },
       );

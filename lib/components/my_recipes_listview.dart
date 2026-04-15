@@ -1,11 +1,16 @@
 import 'package:am_i_cooked/components/recipe_container.dart';
 import 'package:flutter/material.dart';
+import '../pages/recipes_page.dart';
 
 class MyRecipesListview extends StatefulWidget {
   final dynamic toggleMyRecipesExpanded;
   final dynamic getMyRecipesExpanded;
 
-  const MyRecipesListview({super.key, required this.toggleMyRecipesExpanded, required this.getMyRecipesExpanded});
+  const MyRecipesListview({
+    super.key,
+    required this.toggleMyRecipesExpanded,
+    required this.getMyRecipesExpanded,
+  });
 
   @override
   State<MyRecipesListview> createState() => _MyRecipesListviewState();
@@ -47,7 +52,9 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-              icon: _getMyRecipesExpanded() ? Icon(Icons.keyboard_arrow_down, size: 35,): Icon(Icons.keyboard_arrow_up, size: 35),
+              icon: _getMyRecipesExpanded()
+                  ? Icon(Icons.keyboard_arrow_down, size: 35)
+                  : Icon(Icons.keyboard_arrow_up, size: 35),
               style: ButtonStyle(
                 padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
                 minimumSize: WidgetStateProperty.all<Size>(
@@ -81,17 +88,30 @@ class _MyRecipesListviewState extends State<MyRecipesListview> {
                         isBookmarked: _bookmarks[key] ?? true,
                         showBookmarkIcon: true,
                         recipeTitle: 'Poulet Roti',
-                        recipePage: Placeholder(),
+                        recipePageLink: '/recipe/$key',
                         heroTag: key,
+                        onBookmarkChanged: () {
+                          setState(() {
+                            _bookmarks[key] = !(_bookmarks[key] ?? true);
+                          });
+                        },
                         onTap: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => Placeholder()),
+                            MaterialPageRoute(
+                              builder: (_) => RecipesPage(
+                                recipeTitle: "Poulet Roti",
+                                imagePath:
+                                    "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg",
+                                criteria: ['Végétarien', 'Rapide', '< 30 min'],
+                                author: 'Chef Jean',
+                                prepTime: 15,
+                                cookTime: 45,
+                                servings: 4,
+                                difficulty: 'Facile',
+                                heroTag: key,
+                              ),
+                            ),
                           );
-                        },
-                        onBookmarkChanged: (isBookmarked) {
-                          setState(() {
-                            _bookmarks[key] = isBookmarked;
-                          });
                         },
                       ),
                     );

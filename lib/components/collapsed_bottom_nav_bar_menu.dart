@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../pages/search_page.dart';
 import '../utils/nav_bar_switcher.dart';
 
 class CollapsedBottomNavBarMenu extends StatefulWidget {
@@ -19,38 +20,47 @@ class _CollapsedBottomNavBarMenuState extends State<CollapsedBottomNavBarMenu> {
         key: const ValueKey('searchRow'),
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 90,
-            child: TextField(
-              enabled: false,
-              decoration: InputDecoration(
-                suffixIcon: Icon(Icons.search, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                hintText: "Search",
-                hintStyle: TextStyle(
-                  fontFamily: "nunito",
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SearchPage()),
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width - 90,
+              child: TextField(
+                enabled: false,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  hintText: "Search",
+                  hintStyle: TextStyle(
+                    fontFamily: "nunito",
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
                 ),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
               ),
             ),
           ),
-          Hero(
-            tag: "menuButton",
-            child: FilledButton.tonal(
-              onPressed: () => BottomNavBarSwitcher.toggle(),
-              style: FilledButton.styleFrom(
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(16),
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSecondaryContainer),
+          FilledButton.tonal(
+            onPressed: () => BottomNavBarSwitcher.toggle(),
+            style: FilledButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(16),
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            ),
+            child: Icon(
+              Icons.add,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
             ),
           ),
         ],
