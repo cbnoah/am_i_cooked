@@ -28,7 +28,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   void initState() {
     super.initState();
     _pseudonymeController = TextEditingController();
-    _nomUtilisateurController = TextEditingController();
     _loadUserProfile();
   }
 
@@ -81,7 +80,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     await HttpHelper.saveUserProfile(
       _userId,
       _pseudonymeController.text,
-      _nomUtilisateurController.text,
       context: context,
       isMounted: () => mounted,
     );
