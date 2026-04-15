@@ -17,12 +17,10 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
-
   final int _userId = ApiConfig.defaultUserId;
 
   // Form controllers
   late final TextEditingController _pseudonymeController;
-  late final TextEditingController _nomUtilisateurController;
 
   @override
   void initState() {
@@ -34,7 +32,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   @override
   void dispose() {
     _pseudonymeController.dispose();
-    _nomUtilisateurController.dispose();
     super.dispose();
   }
 
@@ -54,7 +51,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   Future<void> _uploadImage(String filePath) async {
     setState(() => _isLoading = true);
 
-    final imageUrl = await HttpHelper.uploadUserImage(
+    final success = await HttpHelper.uploadUserImage(
       _userId,
       filePath,
       context: context,
@@ -62,16 +59,18 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     );
 
     if (mounted) {
-      if (imageUrl != null) setState(() => _imagePath = imageUrl);
+      if (success) {
+        // Display local file path while waiting for BLOB conversion
+        setState(() => _imagePath = filePath);
+      }
       setState(() => _isLoading = false);
     }
   }
 
 
   Future<void> _saveProfile() async {
-    if (_pseudonymeController.text.isEmpty ||
-        _nomUtilisateurController.text.isEmpty) {
-      showErrorSnackbar('Veuillez remplir tous les champs', context);
+    if (_pseudonymeController.text.isEmpty ) {
+      showErrorSnackbar('Veuillez remplir le champ', context);
       return;
     }
 
