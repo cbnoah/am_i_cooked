@@ -1,6 +1,6 @@
 class ApiConfig {
   // URL for API endpoints
-  static const String baseUrl = "http://10.31.33.23:3001";
+  static const String baseUrl = "http://localhost:3001";
   
   // Default user ID for testing (to be replaced with real auth later)
   static const int defaultUserId = 1;
@@ -13,7 +13,7 @@ class ApiConfig {
   static String getUserUrl(int userId) => "$baseUrl/users/$userId";
   
   // Endpoints - Pictures
-  static String getUploadUrl(int userId) => "$baseUrl/pictures/upload/profile/$userId";
+  static String getUploadUrl(int userId) => "$baseUrl/users/$userId/picture";
   static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
   
   // Endpoints - Recipes (to be implemented)
