@@ -176,9 +176,10 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SingleChildScrollView(
-              padding: const EdgeInsets.all(35.0),
+              padding: const EdgeInsets.all(75.0),
               child: _buildProfileSection(),
             ),
             Stack(
@@ -186,7 +187,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
               children: <Widget>[
                 Container(
                   width: 375,
-                  height: 425,
+                  height: 200,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(20),
@@ -240,72 +241,17 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                             ),
                           ),
                           const SizedBox(height: 16.0),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25.0,
-                            ),
-                            child: TextField(
-                              controller: _nomUtilisateurController,
-                              decoration: InputDecoration(
-                                label: const Text("Nom d'utilisateur"),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                  borderSide: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primaryContainer,
-                                    width: 2,
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25.0,
-                            ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                label: const Text("Description"),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                  borderSide: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primaryContainer,
-                                    width: 2,
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.only(top: 100.0),
+                      padding: const EdgeInsets.only(top: 15.0),
                       child: Center(
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _saveProfile,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 50.0,
+                              horizontal: 40.0,
                               vertical: 25.0,
                             ),
                             backgroundColor: Theme.of(
