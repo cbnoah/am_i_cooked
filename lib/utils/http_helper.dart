@@ -128,7 +128,7 @@ class HttpHelper {
 
   // ========== HIGH-LEVEL BUSINESS LOGIC ==========
 
-  /// Load user profile picture URL
+  /// Load user profile picture BLOB and return as data URL
   static Future<String?> loadUserProfile(
     int userId, {
     required BuildContext context,
@@ -144,32 +144,38 @@ class HttpHelper {
 
     if (!isMounted() || userData == null) return null;
 
-    // 2. Get picture URL if picture_id exists
+    // 2. Get picture BLOB if picture_id exists
     final pictureId = userData['profile_picture_id'];
     if (pictureId != null) {
-      final pictureData = await safeGet<Map<String, dynamic>>(
-        '${ApiConfig.baseUrl}/pictures/$pictureId',
-        (body) => jsonDecode(body) as Map<String, dynamic>,
-        context: context,
-        isMounted: isMounted,
-      );
+      try {
+        final response = await http
+            .get(Uri.parse('${ApiConfig.baseUrl}/pictures/$pictureId'))
+            .timeout(const Duration(seconds: 15));
 
-      if (!isMounted() || pictureData == null) return null;
-      return pictureData['url'] as String?;
+        if (!isMounted()) return null;
+
+        if (response.statusCode == 200) {
+          // Convert BLOB to base64 data URL
+          final base64Image = base64Encode(response.bodyBytes);
+          return 'data:image/jpeg;base64,$base64Image';
+        }
+      } catch (e) {
+        debugPrint('Error loading picture: $e');
+      }
     }
 
     return null;
   }
 
-  /// Upload user profile picture and return image URL
-  static Future<String?> uploadUserImage(
+  /// Upload user profile picture as BLOB and return success status
+  static Future<bool> uploadUserImage(
     int userId,
     String filePath, {
     required BuildContext context,
     required bool Function() isMounted,
   }) async {
     final multipartFile = await http.MultipartFile.fromPath(
-      'avatar',
+      'img_blob',
       filePath,
     );
 
@@ -181,9 +187,10 @@ class HttpHelper {
       isMounted: isMounted,
     );
 
-    if (!isMounted() || result == null) return null;
+    if (!isMounted() || result == null) return false;
+    
     showSuccessSnackbar('Image uploaded with success!', context);
-    return result['url'] as String?;
+    return true;
   }
 
   /// Save user profile (username, email)
