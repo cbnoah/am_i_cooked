@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:am_i_cooked/utils/snack_bar_handler.dart';
+
 
 class ProfileEditingPage extends StatefulWidget {
   const ProfileEditingPage({super.key});
@@ -58,17 +60,20 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
         }
       } else {
         if (mounted) {
-          _showErrorSnackbar('Error: ${userResponse.statusCode}');
+          showErrorSnackbar('Error: ${userResponse.statusCode}',
+          context);
         }
       }
     } on SocketException catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
+        showErrorSnackbar('Network error: ${e.message}',
+        context );
       }
       debugPrint('Socket error: $e');
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Error: $e');
+        showErrorSnackbar('Error: $e',
+        context);
       }
       debugPrint('Error loading profile : $e');
     } finally {
@@ -106,22 +111,26 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
       if (response.statusCode == 201) {
         setState(() => _imagePath = data['url']);
         if (mounted) {
-          _showSuccessSnackbar('Image uploaded with success!');
+          showSuccessSnackbar('Image uploaded with success!',
+          context);
         }
       } else {
         if (mounted) {
-          _showErrorSnackbar('Upload error: ${response.statusCode}');
+          showErrorSnackbar('Upload error: ${response.statusCode}',
+          context);
         }
         debugPrint('Error uploading image : $body');
       }
     } on SocketException catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
+        showErrorSnackbar('Network error: ${e.message}',
+        context);
       }
       debugPrint('Socket error upload: $e');
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Error: $e');
+        showErrorSnackbar('Error: $e',
+        context);
       }
       debugPrint('Exception upload : $e');
     } finally {
@@ -131,25 +140,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     }
   }
 
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
 
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   Future<void> _pickImage() async {
     showModalBottomSheet(
@@ -238,14 +229,14 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
         child: Column(
           children: [
             SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(35.0),
               child: _buildProfileSection(),
             ),
             Stack(
               alignment: AlignmentGeometry.topCenter,
               children: <Widget>[
                 Container(
-                  width: 350,
+                  width: 375,
                   height: 425,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.secondaryContainer,
@@ -362,8 +353,9 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             // TODO: save profile changes
-                            _showSuccessSnackbar(
+                            showSuccessSnackbar(
                               'Profil mis à jour avec succès!',
+                              context
                             );
                           },
                           style: ElevatedButton.styleFrom(
