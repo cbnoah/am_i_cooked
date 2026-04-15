@@ -1,6 +1,6 @@
 class ApiConfig {
-  // URL de base du serveur
-  static const String baseUrl = "http://10.31.33.23:3001";
+  // URL for API endpoints
+  static const String baseUrl = "http://localhost:3001";
   
   // ID utilisateur par défaut
   static const int defaultUserId = 1;
@@ -13,7 +13,7 @@ class ApiConfig {
   static String getUserUrl(int userId) => "$baseUrl/users/$userId";
   
   // Endpoints - Pictures
-  static String getUploadUrl(int userId) => "$baseUrl/pictures/upload/profile/$userId";
+  static String getUploadUrl(int userId) => "$baseUrl/users/$userId/picture";
   static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
   
   // Endpoints - Recettes (à ajouter plus tard)

@@ -17,28 +17,21 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
-
   final int _userId = ApiConfig.defaultUserId;
 
   // Form controllers
   late final TextEditingController _pseudonymeController;
-  late final TextEditingController _nomUtilisateurController;
-  late final TextEditingController _descriptionController;
 
   @override
   void initState() {
     super.initState();
     _pseudonymeController = TextEditingController();
-    _nomUtilisateurController = TextEditingController();
-    _descriptionController = TextEditingController();
     _loadUserProfile();
   }
 
   @override
   void dispose() {
     _pseudonymeController.dispose();
-    _nomUtilisateurController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -58,7 +51,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   Future<void> _uploadImage(String filePath) async {
     setState(() => _isLoading = true);
 
-    final imageUrl = await HttpHelper.uploadUserImage(
+    final success = await HttpHelper.uploadUserImage(
       _userId,
       filePath,
       context: context,
@@ -66,16 +59,18 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     );
 
     if (mounted) {
-      if (imageUrl != null) setState(() => _imagePath = imageUrl);
+      if (success) {
+        // Display local file path while waiting for BLOB conversion
+        setState(() => _imagePath = filePath);
+      }
       setState(() => _isLoading = false);
     }
   }
 
 
   Future<void> _saveProfile() async {
-    if (_pseudonymeController.text.isEmpty ||
-        _nomUtilisateurController.text.isEmpty) {
-      showErrorSnackbar('Veuillez remplir tous les champs', context);
+    if (_pseudonymeController.text.isEmpty ) {
+      showErrorSnackbar('Veuillez remplir le champ', context);
       return;
     }
 
@@ -84,8 +79,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     await HttpHelper.saveUserProfile(
       _userId,
       _pseudonymeController.text,
-      _nomUtilisateurController.text,
-      _descriptionController.text,
       context: context,
       isMounted: () => mounted,
     );
@@ -182,9 +175,10 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SingleChildScrollView(
-              padding: const EdgeInsets.all(35.0),
+              padding: const EdgeInsets.all(75.0),
               child: _buildProfileSection(),
             ),
             Stack(
@@ -192,7 +186,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
               children: <Widget>[
                 Container(
                   width: 375,
-                  height: 425,
+                  height: 200,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(20),
@@ -225,63 +219,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                             child: TextField(
                               controller: _pseudonymeController,
                               decoration: InputDecoration(
-                                label: const Text("Pseudonyme"),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                  borderSide: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primaryContainer,
-                                    width: 2,
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25.0,
-                            ),
-                            child: TextField(
-                              controller: _nomUtilisateurController,
-                              decoration: InputDecoration(
-                                label: const Text("Nom d'utilisateur"),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                  borderSide: BorderSide(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primaryContainer,
-                                    width: 2,
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 25.0,
-                            ),
-                            child: TextField(
-                              controller: _descriptionController,
-                              decoration: InputDecoration(
-                                label: const Text("Description"),
+                                label: const Text("Username"),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(10),
@@ -306,13 +244,13 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.only(top: 100.0),
+                      padding: const EdgeInsets.only(top: 15.0),
                       child: Center(
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _saveProfile,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 50.0,
+                              horizontal: 40.0,
                               vertical: 25.0,
                             ),
                             backgroundColor: Theme.of(
