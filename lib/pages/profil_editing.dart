@@ -23,14 +23,12 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   // Form controllers
   late final TextEditingController _pseudonymeController;
   late final TextEditingController _nomUtilisateurController;
-  late final TextEditingController _descriptionController;
 
   @override
   void initState() {
     super.initState();
     _pseudonymeController = TextEditingController();
     _nomUtilisateurController = TextEditingController();
-    _descriptionController = TextEditingController();
     _loadUserProfile();
   }
 
@@ -38,7 +36,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   void dispose() {
     _pseudonymeController.dispose();
     _nomUtilisateurController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -85,7 +82,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
       _userId,
       _pseudonymeController.text,
       _nomUtilisateurController.text,
-      _descriptionController.text,
       context: context,
       isMounted: () => mounted,
     );
@@ -225,7 +221,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                             child: TextField(
                               controller: _pseudonymeController,
                               decoration: InputDecoration(
-                                label: const Text("Pseudonyme"),
+                                label: const Text("Username"),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(10),
@@ -279,7 +275,6 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                               horizontal: 25.0,
                             ),
                             child: TextField(
-                              controller: _descriptionController,
                               decoration: InputDecoration(
                                 label: const Text("Description"),
                                 enabledBorder: OutlineInputBorder(
