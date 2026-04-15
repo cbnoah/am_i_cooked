@@ -189,8 +189,7 @@ class HttpHelper {
   /// Save user profile (username, email)
   static Future<bool> saveUserProfile(
     int userId,
-    String username,
-    String email, {
+    String username,{
     required BuildContext context,
     required bool Function() isMounted,
   }) async {
@@ -198,7 +197,6 @@ class HttpHelper {
       ApiConfig.getUserUrl(userId),
       {
         'username': username,
-        'email': email,
       },
       (body) => jsonDecode(body) as Map<String, dynamic>,
       context: context,
