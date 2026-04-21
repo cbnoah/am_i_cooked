@@ -15,7 +15,7 @@ Future<bool> modifyUserProfile(int id, String username, String email) async {
   dio.options.headers['Content-Type'] = 'application/json';
   dio.options.headers['access-token'] = 'Bearer ${await TokenService.instance.getAccessToken()}';
   try {
-    final response = await dio.put(
+    final response = await dio.patch(
       ApiConfig.getUserUrl(id),
       data: {'username': username, 'email': email},
     );
