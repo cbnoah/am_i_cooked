@@ -1,7 +1,7 @@
 /// Configuration centralisée pour tous les appels API
 class ApiConfig {
   // Server URL
-  static const String baseUrl = "http://10.31.33.23:3001";
+  static const String baseUrl = String.fromEnvironment("API_URL");
 
   // ID user by default (à remplacer par une gestion d'authentification plus tard)
   static const int defaultUserId = 1;
