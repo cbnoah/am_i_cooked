@@ -2,6 +2,7 @@ import 'package:am_i_cooked/models/user_model.dart';
 import 'package:dio/dio.dart';
 
 import '../config/api_config.dart';
+import '../service/token_service.dart';
 
 Future<UserModel> fetchUserProfile(int id) async {
   Dio dio = Dio();
@@ -11,6 +12,8 @@ Future<UserModel> fetchUserProfile(int id) async {
 
 Future<bool> modifyUserProfile(int id, String username, String email) async {
   Dio dio = Dio();
+  dio.options.headers['Content-Type'] = 'application/json';
+  dio.options.headers['access-token'] = 'Bearer ${await TokenService.instance.getAccessToken()}';
   try {
     final response = await dio.put(
       ApiConfig.getUserUrl(id),
