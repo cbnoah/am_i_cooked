@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:am_i_cooked/pages/profil_editing.dart';
 import 'package:am_i_cooked/components/my_recipes_listview.dart';
 import 'package:am_i_cooked/components/profil_picture_container.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
@@ -44,6 +45,54 @@ class _ProfilePageState extends State<ProfilePage> {
       final sessionId = await _authService.getSessionId();
       if (sessionId != null) {
         _userId = int.tryParse(sessionId);
+  Future<void> _loadUserProfile() async {
+    if (!mounted) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // 1. Get user data to find profile picture ID
+      final userResponse = await http
+          .get(Uri.parse(ApiConfig.getUserUrl(_userId)))
+          .timeout(const Duration(seconds: 15));
+
+      if (!mounted) return;
+
+      if (userResponse.statusCode == 200) {
+        final userData = jsonDecode(userResponse.body);
+        final pictureId = userData['profile_picture_id'];
+
+        if (pictureId != null) {
+          // 2. Get the picture URL using the picture ID
+          final picResponse = await http
+              .get(Uri.parse('${ApiConfig.baseUrl}/pictures/$pictureId'))
+              .timeout(const Duration(seconds: 15));
+
+          if (!mounted) return;
+
+          if (picResponse.statusCode == 200) {
+            final picData = jsonDecode(picResponse.body);
+            setState(() => _imagePath = picData['url']);
+          }
+        }
+      } else {
+        if (mounted) {
+          _showErrorSnackbar('Error: ${userResponse.statusCode}');
+        }
+      }
+    } on SocketException catch (e) {
+      if (mounted) {
+        _showErrorSnackbar('Network error: ${e.message}');
+      }
+      debugPrint('Socket error: $e');
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackbar('Error: $e');
+      }
+      debugPrint('Error loading profile : $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
     if (mounted) {
@@ -57,14 +106,14 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!mounted || _userId == null) return;
     
     setState(() => _isLoading = true);
-    
+
     try {
       final uri = Uri.parse(ApiConfig.getUploadUrl(_userId!));
       final request = http.MultipartRequest('POST', uri);
 
       request.files.add(
         await http.MultipartFile.fromPath(
-          'avatar', // doit matcher le nom dans multerUploadConf.single('avatar')
+          'avatar', // must match the name in multerUploadConf.single('avatar')
           filePath,
         ),
       );
@@ -81,24 +130,24 @@ class _ProfilePageState extends State<ProfilePage> {
       if (response.statusCode == 201) {
         setState(() => _imagePath = data['url']);
         if (mounted) {
-          _showSuccessSnackbar('Image uploadée avec succès!');
+          _showSuccessSnackbar('Image uploaded with success!');
         }
       } else {
         if (mounted) {
-          _showErrorSnackbar('Erreur upload: ${response.statusCode}');
+          _showErrorSnackbar('Upload error: ${response.statusCode}');
         }
-        debugPrint('❌ Erreur upload : $body');
+        debugPrint('Error uploading image : $body');
       }
     } on SocketException catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Erreur réseau: ${e.message}');
+        _showErrorSnackbar('Network error: ${e.message}');
       }
-      debugPrint('🔌 Erreur socket upload: $e');
+      debugPrint('Socket error upload: $e');
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Erreur: $e');
+        _showErrorSnackbar('Error: $e');
       }
-      debugPrint('❌ Exception upload : $e');
+      debugPrint('Exception upload : $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -177,7 +226,10 @@ class _ProfilePageState extends State<ProfilePage> {
         ProfilePictureContainer(
           pathImage: _imagePath,
           isEditIconVisible: true,
-          onEditPressed: _isLoading ? null : _pickImage,
+          onEditPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfileEditingPage()),
+          ),
         ),
         const SizedBox(height: 10),
         Row(
@@ -201,7 +253,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ],
         ),
-        // ✅ CORRIGÉ: Supprimé 'year2023: false' qui n'existe pas
         LinearProgressIndicator(
           value: 0.2,
           minHeight: 8,

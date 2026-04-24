@@ -1,4 +1,3 @@
-/// Configuration centralisée pour tous les appels API
 class ApiConfig {
   // Server URL
   static const String baseUrl = String.fromEnvironment("API_URL");
@@ -6,15 +5,15 @@ class ApiConfig {
   // ID user by default (à remplacer par une gestion d'authentification plus tard)
   static const int defaultUserId = 1;
   
-  // Timeouts (in seconds)
+  // Timeouts (en secondes)
   static const int connectTimeout = 15;
   static const int uploadTimeout = 30;
   
   // Endpoints - Users
   static String getUserUrl(int userId) => "$baseUrl/users/$userId";
   
-  // Endpoints - Photos
-  static String getUploadUrl(int userId) => "$baseUrl/pictures/upload/profile/$userId";
+  // Endpoints - Pictures
+  static String getUploadUrl(int userId) => "$baseUrl/users/$userId/picture";
   static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
   
   // Endpoints - Recipes
