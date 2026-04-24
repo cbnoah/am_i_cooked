@@ -1,6 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/pages/profile_page.dart';
 import 'package:am_i_cooked/pages/recipes_page.dart';
+import 'package:am_i_cooked/pages/search_page.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
 import 'package:am_i_cooked/theme/dark_theme_data.dart';
 import 'package:am_i_cooked/theme/light_theme_data.dart';
@@ -40,6 +41,9 @@ void main() async {
           return ProfilePage();
         },
       ),
+      GoRoute(path: '/search', builder: (context, state) => SearchPage()),
+      GoRoute(path: '/new', builder: (context, state) => const Scaffold(body: Center(child: Text('New Recipe Page')))),
+      GoRoute(path: '/bookmarks', builder: (context, state) => const Scaffold(body: Center(child: Text('Bookmarks Page')))),
     ],
     initialLocation: '/',
   );
