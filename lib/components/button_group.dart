@@ -1,7 +1,5 @@
-import 'package:am_i_cooked/pages/profile_page.dart';
 import 'package:flutter/material.dart';
-
-import '../utils/page_route_builder.dart';
+import 'package:go_router/go_router.dart';
 
 class ButtonGroup extends StatefulWidget {
   const ButtonGroup({super.key});
@@ -21,7 +19,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
       children: [
         FilledButton(
           onPressed: () {
-            Navigator.of(context).push(createRoute(const Placeholder()));
+            context.push("/new");
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),
@@ -57,7 +55,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
         ),
         FilledButton(
           onPressed: () {
-            Navigator.of(context).push(createRoute(const Placeholder()));
+            context.push("/bookmarks");
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),
@@ -87,7 +85,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
         ),
         FilledButton(
           onPressed: () {
-            Navigator.of(context).push(createRoute(const ProfilePage()));
+            context.push("/profile");
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),

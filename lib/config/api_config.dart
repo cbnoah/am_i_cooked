@@ -1,8 +1,8 @@
 class ApiConfig {
-  // URL for API endpoints
-  static const String baseUrl = "http://localhost:3001";
-  
-  // ID utilisateur par défaut
+  // Server URL
+  static const String baseUrl = String.fromEnvironment("API_URL");
+
+  // ID user by default (à remplacer par une gestion d'authentification plus tard)
   static const int defaultUserId = 1;
   
   // Timeouts (en secondes)
@@ -16,7 +16,8 @@ class ApiConfig {
   static String getUploadUrl(int userId) => "$baseUrl/users/$userId/picture";
   static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
   
-  // Endpoints - Recettes (à ajouter plus tard)
+  // Endpoints - Recipes
+  static String getAllRecipesUrl() => "$baseUrl/recipes";
   static String getRecipesUrl(int userId) => "$baseUrl/recipes/user/$userId";
   static String getRecipeUrl(int recipeId) => "$baseUrl/recipes/$recipeId";
 

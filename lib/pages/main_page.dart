@@ -1,61 +1,73 @@
+import 'package:am_i_cooked/config/api_config.dart';
+import 'package:am_i_cooked/models/recipe_model.dart';
+import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../utils/nav_bar_switcher.dart';
 import '../components/recipe_container.dart';
-import 'recipes_page.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   final Map<String, bool> _bookmarks = {};
+  static const String _placeholderImageUrl =
+      'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg';
 
-  List<Widget> _buildTestListForCarousel(String prefix) {
-    return List.generate(5, (index) {
-      final key = '$prefix-$index';
-      final recipeTitle = 'Poulet Roti';
-      final imagePath =
-          "https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg";
+  String _bookmarkKeyFor(RecipeModel recipe, String fallback) {
+    return recipe.id?.toString() ?? recipe.name ?? fallback;
+  }
+
+  String _heroTagFor(String prefix, RecipeModel recipe, int index) {
+    return '$prefix-${recipe.id ?? index}';
+  }
+
+  String _imagePathFor(RecipeModel recipe) {
+    return recipe.idPicture != null
+        ? ApiConfig.getPictureUrl(recipe.idPicture!)
+        : _placeholderImageUrl;
+  }
+
+  List<Widget> _buildCarouselChildren(
+    String prefix,
+    List<RecipeModel> recipes,
+  ) {
+    return recipes.asMap().entries.map((entry) {
+      final index = entry.value.id;
+      final recipe = entry.value;
+      final heroTag = _heroTagFor(prefix, recipe, index!);
+      final bookmarkKey = _bookmarkKeyFor(recipe, heroTag);
+      final imagePath = _imagePathFor(recipe);
+
       return RecipeContainer(
-        key: ValueKey(key),
+        key: ValueKey(heroTag),
         path: imagePath,
-        isBookmarked: _bookmarks[key] ?? true,
+        isBookmarked: _bookmarks[bookmarkKey] ?? true,
         showBookmarkIcon: true,
-        recipeTitle: 'Poulet Roti',
-        recipePageLink: '/recipe/$key',
-        heroTag: key,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => RecipesPage(
-                heroTag: key,
-                recipeTitle: recipeTitle,
-                imagePath: imagePath,
-                criteria: ['Végétarien', 'Rapide', '< 30 min'],
-                author: 'Chef Jean',
-                prepTime: 15,
-                cookTime: 45,
-                servings: 4,
-                difficulty: 'Facile',
-              ),
-            ),
-          );
-        },
+        recipeTitle: recipe.displayName,
+        recipePageLink: '/recipe/$heroTag',
+        heroTag: heroTag,
+        onTap: () => context.push('/recipe/$index'),
         onBookmarkChanged: () {
           setState(() {
-            _bookmarks[key] = !(_bookmarks[key] ?? true);
+            _bookmarks[bookmarkKey] = !(_bookmarks[bookmarkKey] ?? true);
           });
         },
       );
-    });
+    }).toList();
   }
 
+  // TODO: implement trends carousel with real data (maybe based on number of bookmarks or notation?)
   @override
   Widget build(BuildContext context) {
+    final recipesAsync = ref.watch(recipesProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -67,94 +79,161 @@ class _MainPageState extends State<MainPage> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: recipesAsync.when(
+        data: (recipes) {
+          final recommendedCarousel = recipes.take(5).toList();
+          final trendsCarousel = recipes.take(5).toList();
 
-            children: [
-              Text(
-                "Enfin de retour 👋!",
-                style: TextStyle(
-                  fontFamily: "nunito",
-                  fontWeight: FontWeight.w900,
-                  fontStyle: FontStyle.italic,
-                  fontSize: 36,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              Text(
-                "Voici quelques nouvelles recettes à tester",
-                style: TextStyle(
-                  fontFamily: "nunito",
-                  fontSize: 24,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              Padding(
+          return RefreshIndicator(
+            onRefresh: () => ref.refresh(recipesProvider.future),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 30.0,
-                  vertical: 15.0,
+                  horizontal: 8.0,
+                  vertical: 8.0,
                 ),
-                child: Divider(color: Theme.of(context).colorScheme.outline),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Enfin de retour 👋!',
+                      style: TextStyle(
+                        fontFamily: 'nunito',
+                        fontWeight: FontWeight.w900,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 36,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    Text(
+                      'Voici quelques nouvelles recettes à tester',
+                      style: TextStyle(
+                        fontFamily: 'nunito',
+                        fontSize: 24,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30.0,
+                        vertical: 15.0,
+                      ),
+                      child: Divider(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                    Text(
+                      'Recommendations : ',
+                      style: TextStyle(
+                        fontFamily: 'nunito',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: 180,
+                        maxWidth: MediaQuery.of(context).size.width,
+                      ),
+                      child: recommendedCarousel.isEmpty
+                          ? Center(
+                              child: Text(
+                                "Aucune recette trouvée 😢",
+                                style: TextStyle(
+                                  fontFamily: "Nunito",
+                                  fontWeight: FontWeight.w300,
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 20,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
+                            )
+                          : CarouselView(
+                              enableSplash: false,
+                              itemSnapping: true,
+                              itemExtent: 270.0,
+                              children: _buildCarouselChildren(
+                                'forYou',
+                                recommendedCarousel,
+                              ),
+                            ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30.0,
+                        vertical: 5.0,
+                      ),
+                      child: Divider(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                    Text(
+                      'Tendance : ',
+                      style: TextStyle(
+                        fontFamily: 'nunito',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: 180,
+                        maxWidth: MediaQuery.of(context).size.width,
+                      ),
+                      child: trendsCarousel.isEmpty
+                          ? Center(
+                              child: Text(
+                                "Aucune recette trouvée 😢",
+                                style: TextStyle(
+                                  fontFamily: "Nunito",
+                                  fontWeight: FontWeight.w300,
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 20,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ),
+                            )
+                          : CarouselView(
+                              enableSplash: false,
+                              itemSnapping: true,
+                              itemExtent: 270.0,
+                              children: _buildCarouselChildren(
+                                'trends',
+                                trendsCarousel,
+                              ),
+                            ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
-              Text(
-                "Recommendations : ",
-                style: TextStyle(
-                  fontFamily: "nunito",
-                  fontWeight: FontWeight.w700,
-                  fontSize: 22,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.left,
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Impossible de charger les recettes : $error',
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontWeight: FontWeight.w700,
+                fontSize: 50,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: 180,
-                  maxWidth: MediaQuery.of(context).size.width,
-                ),
-                child: CarouselView.weighted(
-                  itemSnapping: true,
-                  // WARNING : flexWeights makes the carousel moves very fast if the weights in the beginning are low (flutter bug still not fixed
-                  // see https://github.com/flutter/flutter/issues/160350)
-                  flexWeights: [2, 7, 2],
-                  children: _buildTestListForCarousel('forYou'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30.0,
-                  vertical: 5.0,
-                ),
-                child: Divider(color: Theme.of(context).colorScheme.outline),
-              ),
-              Text(
-                "Tendance : ",
-                style: TextStyle(
-                  fontFamily: "nunito",
-                  fontWeight: FontWeight.w700,
-                  fontSize: 22,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: 180,
-                  maxWidth: MediaQuery.of(context).size.width,
-                ),
-                child: CarouselView.weighted(
-                  itemSnapping: true,
-                  // WARNING : flexWeights makes the carousel moves very fast if the weights in the beginning are low (flutter bug still not fixed
-                  // see https://github.com/flutter/flutter/issues/160350)
-                  flexWeights: [2, 7, 2],
-                  children: _buildTestListForCarousel('trends'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
