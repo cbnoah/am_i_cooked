@@ -67,11 +67,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
           });
         },
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => RecipesPage(recipe: recipe, heroTag: heroTag, id: 0,),
-            ),
-          );
+          context.push('/recipe/${recipe.id}');
         },
       ),
     );
