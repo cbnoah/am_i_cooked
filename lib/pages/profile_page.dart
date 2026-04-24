@@ -267,6 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: MyRecipesListview(
                                   toggleMyRecipesExpanded: _toggleMyRecipesExpanded,
                                   getMyRecipesExpanded: _getMyRecipesExpanded,
+                                  context: context,
                                 ),
                               ),
                             ],
