@@ -1,35 +1,55 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
 class ProfilePictureContainer extends StatelessWidget {
-  final String pathImage;
+  static const String _pathPlaceHolderImage =
+      "https://i.redd.it/jqop4dqqmdx91.jpg";
+  final String? pathImage;
+  final Uint8List? imageBlob;
   final bool isEditIconVisible;
   final VoidCallback? onEditPressed;
 
   const ProfilePictureContainer({
     super.key,
-    required this.pathImage,
     required this.isEditIconVisible,
     required this.onEditPressed,
+    this.imageBlob,
+    this.pathImage,
   });
+
+  ImageProvider<Object> _resolveImageProvider() {
+    if (imageBlob != null && imageBlob!.isNotEmpty) {
+      return MemoryImage(imageBlob!);
+    }
+
+    final path = pathImage;
+    if (path != null && path.isNotEmpty) {
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        return NetworkImage(path);
+      }
+      return FileImage(File(path));
+    }
+
+    return const NetworkImage(_pathPlaceHolderImage);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final imageProvider = _resolveImageProvider();
     return M3Container.sunny(
       height: 200,
       width: 200,
-      color: Color(0xFF4F378A),
+      color: const Color(0xFF4F378A),
       child: Center(
         child: Container(
           height: 150,
           width: 150,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: pathImage.startsWith("http")
-                ? NetworkImage(pathImage) as ImageProvider  
-                : FileImage(File(pathImage)),
-                fit: BoxFit.cover,
+              image: imageProvider,
+              fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.circular(75),
             boxShadow: [
@@ -45,8 +65,8 @@ class ProfilePictureContainer extends StatelessWidget {
           child: isEditIconVisible
               ? FloatingActionButton(
                   onPressed: onEditPressed,
-                  shape: CircleBorder(),
-                  backgroundColor: Color(0xFF4F378A),
+                  shape: const CircleBorder(),
+                  backgroundColor: const Color(0xFF4F378A),
                   child: Icon(
                     Icons.edit_outlined,
                     color: Theme.of(context).colorScheme.surface,
