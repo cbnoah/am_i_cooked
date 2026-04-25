@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class MyRecipesListview extends ConsumerStatefulWidget {
+  final int userId;
   final dynamic toggleMyRecipesExpanded;
   final dynamic getMyRecipesExpanded;
   final BuildContext? context;
@@ -16,6 +17,7 @@ class MyRecipesListview extends ConsumerStatefulWidget {
     required this.toggleMyRecipesExpanded,
     required this.getMyRecipesExpanded,
     this.context,
+    required this.userId,
   });
 
   @override
@@ -45,7 +47,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
 
   String _imagePathFor(RecipeModel recipe) {
     return recipe.idPicture != null
-        ? ApiConfig.getPictureUrl(recipe.idPicture!)
+        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
         : _placeholderImageUrl;
   }
 
@@ -77,7 +79,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
 
   @override
   Widget build(BuildContext context) {
-    final recipesAsync = ref.watch(recipesProvider);
+    final recipesAsync = ref.watch(userRecipesProvider(widget.userId));
 
     return Container(
       width: double.infinity,
@@ -180,6 +182,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
                     : Padding(
                         padding: const EdgeInsets.only(top: 16.0),
                         child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           scrollDirection: Axis.vertical,
                           itemCount: recipes.length,
                           separatorBuilder: (context, index) =>
