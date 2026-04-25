@@ -180,7 +180,7 @@ class HttpHelper {
     );
 
     final result = await safeMultipartPost<Map<String, dynamic>>(
-      ApiConfig.getUploadUrl(userId),
+      ApiConfig.getProfilePictureUrl(userId),
       [multipartFile],
       (body) => jsonDecode(body) as Map<String, dynamic>,
       context: context,
