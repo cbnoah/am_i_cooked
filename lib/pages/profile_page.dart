@@ -1,158 +1,73 @@
-import 'dart:convert';
 import 'dart:io';
+import 'package:am_i_cooked/models/user_model.dart';
 import 'package:am_i_cooked/pages/profil_editing.dart';
 import 'package:am_i_cooked/components/my_recipes_listview.dart';
 import 'package:am_i_cooked/components/profil_picture_container.dart';
+import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
 import 'package:am_i_cooked/utils/profile_scrapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:am_i_cooked/config/api_config.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:share_plus/share_plus.dart';
 
-class ProfilePage extends StatefulWidget {
+import '../config/api_config.dart';
+
+enum SampleItem { share, deleteUser }
+
+class ProfilePage extends ConsumerStatefulWidget {
   final int? userId;
-  const ProfilePage({super.key,this.userId});
+
+  const ProfilePage({super.key, this.userId});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _myRecipesExpanded = false;
-  String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
-  final ImagePicker _picker = ImagePicker();
-  bool _isLoading = false;
-  
+
   int? _userId;
-  bool _isInitLoaded = false;
   late final Dio _dio;
   late final AuthService _authService;
+  late Future<UserModel?> _futureUser;
+
+  SampleItem? selectedItem;
 
   @override
   void initState() {
     super.initState();
     _dio = Dio();
     _authService = AuthService(_dio);
-    _initUser();
+    _futureUser = _initUser();
   }
 
-  Future<void> _initUser() async {
-    if (widget.userId != null) {
-      _userId = widget.userId;
-    } else {
-      final sessionId = await _authService.getSessionId();
-      if (sessionId != null) {
-        _userId = int.tryParse(sessionId);
-  Future<void> _loadUserProfile() async {
-    if (!mounted) return;
+  Future<void> _pullRefresh() async {
+    setState(() {
+      _futureUser = _initUser();
+    });
 
-    setState(() => _isLoading = true);
+    await _futureUser;
 
-    try {
-      // 1. Get user data to find profile picture ID
-      final userResponse = await http
-          .get(Uri.parse(ApiConfig.getUserUrl(_userId)))
-          .timeout(const Duration(seconds: 15));
-
-      if (!mounted) return;
-
-      if (userResponse.statusCode == 200) {
-        final userData = jsonDecode(userResponse.body);
-        final pictureId = userData['profile_picture_id'];
-
-        if (pictureId != null) {
-          // 2. Get the picture URL using the picture ID
-          final picResponse = await http
-              .get(Uri.parse('${ApiConfig.baseUrl}/pictures/$pictureId'))
-              .timeout(const Duration(seconds: 15));
-
-          if (!mounted) return;
-
-          if (picResponse.statusCode == 200) {
-            final picData = jsonDecode(picResponse.body);
-            setState(() => _imagePath = picData['url']);
-          }
-        }
-      } else {
-        if (mounted) {
-          _showErrorSnackbar('Error: ${userResponse.statusCode}');
-        }
-      }
-    } on SocketException catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
-      }
-      debugPrint('Socket error: $e');
-    } catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Error: $e');
-      }
-      debugPrint('Error loading profile : $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-    if (mounted) {
-      setState(() {
-        _isInitLoaded = true;
-      });
+    if (_userId != null) {
+      final refreshedRecipes = ref.refresh(
+        userRecipesProvider(_userId!).future,
+      );
+      await refreshedRecipes;
     }
   }
 
-  Future<void> _uploadImage(String filePath) async {
-    if (!mounted || _userId == null) return;
-    
-    setState(() => _isLoading = true);
-
-    try {
-      final uri = Uri.parse(ApiConfig.getUploadUrl(_userId!));
-      final request = http.MultipartRequest('POST', uri);
-
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'avatar', // must match the name in multerUploadConf.single('avatar')
-          filePath,
+  Widget _buildRefreshableState(Widget child) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: Center(child: child),
         ),
-      );
-
-      final response = await request.send().timeout(
-        const Duration(seconds: 30),
-      );
-
-      final body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-
-      if (!mounted) return;
-
-      if (response.statusCode == 201) {
-        setState(() => _imagePath = data['url']);
-        if (mounted) {
-          _showSuccessSnackbar('Image uploaded with success!');
-        }
-      } else {
-        if (mounted) {
-          _showErrorSnackbar('Upload error: ${response.statusCode}');
-        }
-        debugPrint('Error uploading image : $body');
-      }
-    } on SocketException catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
-      }
-      debugPrint('Socket error upload: $e');
-    } catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Error: $e');
-      }
-      debugPrint('Exception upload : $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+      ],
+    );
   }
 
   void _showErrorSnackbar(String message) {
@@ -175,7 +90,98 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _pickImage() async {
+  Future<UserModel?> _initUser() async {
+    if (widget.userId != null) {
+      _userId = widget.userId;
+      return _loadUserProfile(_userId!);
+    }
+
+    final sessionId = await _authService.getSessionId();
+    if (sessionId == null) {
+      return null;
+    }
+
+    final parsedUserId = int.tryParse(sessionId);
+    if (parsedUserId == null) {
+      return null;
+    }
+
+    _userId = parsedUserId;
+    return _loadUserProfile(parsedUserId);
+  }
+
+  Future<UserModel?> _loadUserProfile(int id) async {
+    if (!mounted) return null;
+
+    try {
+      ProfileScrapper scrapper = ProfileScrapper();
+      return await scrapper.fetchAllUserData(id);
+    } on SocketException catch (e) {
+      if (mounted) {
+        _showErrorSnackbar('Network error: ${e.message}');
+      }
+      debugPrint('Socket error: $e');
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackbar('Error: $e');
+      }
+      debugPrint('Error loading profile : $e');
+    }
+    return null;
+  }
+
+  Future<void> _uploadImage(String filePath) async {
+    if (!mounted || _userId == null) return;
+
+    try {
+      final uri = Uri.parse(ApiConfig.getProfilePictureUrl(_userId!));
+      final request = http.MultipartRequest('POST', uri);
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'avatar',
+          // must match the name in multerUploadConf.single('avatar')
+          filePath,
+        ),
+      );
+
+      final response = await request.send().timeout(
+        const Duration(seconds: 30),
+      );
+
+      final body = await response.stream.bytesToString();
+
+      if (!mounted) return;
+
+      if (response.statusCode == 201) {
+        if (mounted && _userId != null) {
+          setState(() {
+            _futureUser = _loadUserProfile(_userId!);
+          });
+        }
+        if (mounted) {
+          _showSuccessSnackbar('Image uploaded with success!');
+        }
+      } else {
+        if (mounted) {
+          _showErrorSnackbar('Upload error: ${response.statusCode}');
+        }
+        debugPrint('Error uploading image : $body');
+      }
+    } on SocketException catch (e) {
+      if (mounted) {
+        _showErrorSnackbar('Network error: ${e.message}');
+      }
+      debugPrint('Socket error upload: $e');
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackbar('Error: $e');
+      }
+      debugPrint('Exception upload : $e');
+    }
+  }
+
+  /*Future<void> _pickImage() async {
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -212,7 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
-  }
+  }*/
 
   void _toggleMyRecipesExpanded() {
     setState(() => _myRecipesExpanded = !_myRecipesExpanded);
@@ -220,11 +226,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool _getMyRecipesExpanded() => _myRecipesExpanded;
 
-  Widget _buildProfileSection() {
+  Widget _buildProfileSection(AsyncSnapshot<UserModel?> asyncSnapshot) {
     return Column(
       children: [
         ProfilePictureContainer(
-          pathImage: _imagePath,
+          imageBlob: asyncSnapshot.data?.profilePicture?.imgBlob,
           isEditIconVisible: true,
           onEditPressed: () => Navigator.push(
             context,
@@ -236,7 +242,7 @@ class _ProfilePageState extends State<ProfilePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "LVL 4",
+              "LVL ${asyncSnapshot.data?.lVL ?? 0}",
               style: TextStyle(
                 fontFamily: "bbh_sans_hegarty",
                 fontSize: 16,
@@ -244,7 +250,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             Text(
-              "20%",
+              "${asyncSnapshot.data?.xP}%",
               style: TextStyle(
                 fontFamily: "bbh_sans_hegarty",
                 fontSize: 16,
@@ -254,7 +260,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
         LinearProgressIndicator(
-          value: 0.2,
+          value: asyncSnapshot.data?.xP != null
+              ? asyncSnapshot.data!.xP! / 100
+              : 0,
           minHeight: 8,
           color: Theme.of(context).colorScheme.primary,
           backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -267,74 +275,235 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back),
-        ),
-        title: Text(
-          "Votre Profil",
-          style: TextStyle(fontFamily: "bbh_sans_hegarty", fontSize: 22),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await _authService.logout();
-            },
-            icon: const Icon(Icons.settings_outlined),
-          ),
-        ],
-      ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: !_isInitLoaded
-          ? const Center(child: CircularProgressIndicator())
-          : _userId == null
-              ? const Center(child: Text("Utilisateur introuvable"))
-              : FutureBuilder(
-                  future: fetchUserProfile(_userId!),
-                  builder: (context, asyncSnapshot) {
-                    return Stack(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(_myRecipesExpanded ? 12.0 : 20.0).copyWith(
-                            top: _myRecipesExpanded ? 8.0 : 0,
-                          ),
-                          child: Column(
-                            children: [
-                              AnimatedSize(
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeInOut,
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 200),
-                                  opacity: _myRecipesExpanded ? 0.0 : 1.0,
-                                  child: _myRecipesExpanded
-                                      ? const SizedBox.shrink()
-                                      : _buildProfileSection(),
-                                ),
-                              ),
-                              Expanded(
-                                child: MyRecipesListview(
-                                  toggleMyRecipesExpanded: _toggleMyRecipesExpanded,
-                                  getMyRecipesExpanded: _getMyRecipesExpanded,
-                                  context: context,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (_isLoading)
-                          Container(
-                            color: Colors.black.withAlpha(100),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                      ],
+      appBar: widget.userId == null
+          ? AppBar(
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back),
+              ),
+              title: Text(
+                "Votre Profil",
+                style: TextStyle(fontFamily: "bbh_sans_hegarty", fontSize: 22),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    await _authService.logout();
+                  },
+                  icon: const Icon(Icons.settings_outlined),
+                ),
+              ],
+            )
+          : AppBar(
+              surfaceTintColor: Colors.transparent,
+              leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back),
+              ),
+              title: FutureBuilder(
+                future: _futureUser,
+                builder: (context, asyncSnapshot) {
+                  if (asyncSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return _buildRefreshableState(
+                      const LinearProgressIndicator(),
                     );
                   }
+                  if (asyncSnapshot.hasError) {
+                    return _buildRefreshableState(
+                      Text(
+                        'Erreur',
+                        style: TextStyle(
+                          fontFamily: "Nunito",
+                          fontWeight: FontWeight.w300,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Text(
+                    asyncSnapshot.data!.username == null
+                        ? "Nom d'utilisateur indisponible"
+                        : asyncSnapshot.data!.username!,
+                    style: TextStyle(
+                      fontFamily: "bbh_sans_hegarty",
+                      fontSize: 22,
+                    ),
+                  );
+                },
               ),
+              centerTitle: true,
+              actions: [
+                FutureBuilder(
+                  future: _futureUser,
+                  builder: (context, asyncSnapshot) {
+                    return PopupMenuButton<SampleItem>(
+                      icon: const Icon(Icons.more_vert),
+                      itemBuilder: (BuildContext context) {
+                        return [
+                          PopupMenuItem<SampleItem>(
+                            value: SampleItem.share,
+                            onTap: () => SharePlus.instance.share(
+                              ShareParams(
+                                uri: Uri.parse(
+                                  // TODO: need to change this url when deep link will be ready
+                                  "https://am-i-cooked.com/profile/${asyncSnapshot.data?.id}",
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              spacing: 8.0,
+                              children: [
+                                Icon(
+                                  Icons.share_outlined,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                                Text(
+                                  'Partager le profil',
+                                  style: TextStyle(
+                                    fontFamily: "Nunito",
+                                    fontWeight: FontWeight.w700,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // TODO: add role verification to only show this option to admins
+                          PopupMenuItem<SampleItem>(
+                            value: SampleItem.deleteUser,
+                            child: Row(
+                              spacing: 8.0,
+                              children: [
+                                Icon(
+                                  Icons.delete,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                                Text(
+                                  'Supprimer l\'utilisateur',
+                                  style: TextStyle(
+                                    fontFamily: "Nunito",
+                                    fontWeight: FontWeight.w700,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ];
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: RefreshIndicator(
+        onRefresh: _pullRefresh,
+        child: FutureBuilder<UserModel?>(
+          future: _futureUser,
+          builder: (context, asyncSnapshot) {
+            if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+              return _buildRefreshableState(const CircularProgressIndicator());
+            }
+
+            if (asyncSnapshot.hasError) {
+              return _buildRefreshableState(
+                Text(
+                  'Erreur lors du chargement du profil 🤨',
+                  style: TextStyle(
+                    fontFamily: "Nunito",
+                    fontWeight: FontWeight.w300,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 20,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              );
+            }
+
+            final user = asyncSnapshot.data;
+            if (user == null || _userId == null) {
+              return _buildRefreshableState(
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Utilisateur introuvable 😵‍💫',
+                        style: TextStyle(
+                          fontFamily: "Nunito",
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        'L\'utilisateur que vous essayez de consulter n\'existe pas ou a été supprimé.',
+                        style: TextStyle(
+                          fontFamily: "Nunito",
+                          fontWeight: FontWeight.w300,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(
+                    _myRecipesExpanded ? 12.0 : 20.0,
+                  ).copyWith(top: _myRecipesExpanded ? 8.0 : 0),
+                  child: Column(
+                    children: [
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 200),
+                          opacity: _myRecipesExpanded ? 0.0 : 1.0,
+                          child: _myRecipesExpanded
+                              ? const SizedBox.shrink()
+                              : _buildProfileSection(asyncSnapshot),
+                        ),
+                      ),
+                      Expanded(
+                        child: MyRecipesListview(
+                          userId: _userId!,
+                          toggleMyRecipesExpanded: _toggleMyRecipesExpanded,
+                          getMyRecipesExpanded: _getMyRecipesExpanded,
+                          context: context,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }
