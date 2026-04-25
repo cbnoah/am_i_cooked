@@ -14,8 +14,6 @@ import 'package:share_plus/share_plus.dart';
 
 import '../config/api_config.dart';
 
-enum SampleItem { share, deleteUser }
-
 class ProfilePage extends ConsumerStatefulWidget {
   final int? userId;
 
@@ -32,8 +30,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   late final Dio _dio;
   late final AuthService _authService;
   late Future<UserModel?> _futureUser;
-
-  SampleItem? selectedItem;
 
   @override
   void initState() {
@@ -342,12 +338,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 FutureBuilder(
                   future: _futureUser,
                   builder: (context, asyncSnapshot) {
-                    return PopupMenuButton<SampleItem>(
+                    return PopupMenuButton(
                       icon: const Icon(Icons.more_vert),
                       itemBuilder: (BuildContext context) {
                         return [
-                          PopupMenuItem<SampleItem>(
-                            value: SampleItem.share,
+                          PopupMenuItem(
                             onTap: () => SharePlus.instance.share(
                               ShareParams(
                                 uri: Uri.parse(
@@ -379,8 +374,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             ),
                           ),
                           // TODO: add role verification to only show this option to admins
-                          PopupMenuItem<SampleItem>(
-                            value: SampleItem.deleteUser,
+                          PopupMenuItem(
                             child: Row(
                               spacing: 8.0,
                               children: [
@@ -493,7 +487,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           userId: _userId!,
                           toggleMyRecipesExpanded: _toggleMyRecipesExpanded,
                           getMyRecipesExpanded: _getMyRecipesExpanded,
-                          context: context,
+                          context: context, isOthersProfile: widget.userId != null,
                         ),
                       ),
                     ],
