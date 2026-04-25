@@ -10,11 +10,12 @@ class ApiConfig {
   static const int uploadTimeout = 30;
   
   // Endpoints - Users
+  static String getUsersUrl() => "$baseUrl/users";
   static String getUserUrl(int userId) => "$baseUrl/users/$userId";
   
   // Endpoints - Pictures
-  static String getUploadUrl(int userId) => "$baseUrl/users/$userId/picture";
-  static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
+  static String getProfilePictureUrl(int userId) => "${getUsersUrl()}/$userId/picture";
+  static String getRecipePictureUrl(int userId) => "${getAllRecipesUrl()}/$userId/picture";
   
   // Endpoints - Recipes
   static String getAllRecipesUrl() => "$baseUrl/recipes";
