@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:am_i_cooked/utils/http_helper.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -20,177 +21,53 @@ class _ProfilePageState extends State<ProfilePage> {
   String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
-
   final int _userId = ApiConfig.defaultUserId;
+
+  // Form controllers
+  late final TextEditingController _pseudonymeController;
 
   @override
   void initState() {
     super.initState();
+    _pseudonymeController = TextEditingController();
     _loadUserProfile();
   }
 
-  Future<void> _loadUserProfile() async {
-    if (!mounted) return;
 
-    setState(() => _isLoading = true);
-
-    try {
-      // 1. Get user data to find profile picture ID
-      final userResponse = await http
-          .get(Uri.parse(ApiConfig.getUserUrl(_userId)))
-          .timeout(const Duration(seconds: 15));
-
-      if (!mounted) return;
-
-      if (userResponse.statusCode == 200) {
-        final userData = jsonDecode(userResponse.body);
-        final pictureId = userData['profile_picture_id'];
-
-        if (pictureId != null) {
-          // 2. Get the picture URL using the picture ID
-          final picResponse = await http
-              .get(Uri.parse('${ApiConfig.baseUrl}/pictures/$pictureId'))
-              .timeout(const Duration(seconds: 15));
-
-          if (!mounted) return;
-
-          if (picResponse.statusCode == 200) {
-            final picData = jsonDecode(picResponse.body);
-            setState(() => _imagePath = picData['url']);
-          }
-        }
-      } else {
-        if (mounted) {
-          _showErrorSnackbar('Error: ${userResponse.statusCode}');
-        }
-      }
-    } on SocketException catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
-      }
-      debugPrint('Socket error: $e');
-    } catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Error: $e');
-      }
-      debugPrint('Error loading profile : $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+  @override
+  void dispose() {
+    _pseudonymeController.dispose();
+    super.dispose();
   }
 
-  Future<void> _uploadImage(String filePath) async {
-    if (!mounted) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final uri = Uri.parse(ApiConfig.getUploadUrl(_userId));
-      final request = http.MultipartRequest('POST', uri);
-
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'avatar', // must match the name in multerUploadConf.single('avatar')
-          filePath,
-        ),
-      );
-
-      final response = await request.send().timeout(
-        const Duration(seconds: 30),
-      );
-
-      final body = await response.stream.bytesToString();
-      final data = jsonDecode(body);
-
-      if (!mounted) return;
-
-      if (response.statusCode == 201) {
-        setState(() => _imagePath = data['url']);
-        if (mounted) {
-          _showSuccessSnackbar('Image uploaded with success!');
-        }
-      } else {
-        if (mounted) {
-          _showErrorSnackbar('Upload error: ${response.statusCode}');
-        }
-        debugPrint('Error uploading image : $body');
-      }
-    } on SocketException catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
-      }
-      debugPrint('Socket error upload: $e');
-    } catch (e) {
-      if (mounted) {
-        _showErrorSnackbar('Error: $e');
-      }
-      debugPrint('Exception upload : $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  Future<void> _pickImage() async {
-    showModalBottomSheet(
+    Future<void> _loadUserProfile() async {
+    final imageUrl = await HttpHelper.loadUserProfile(
+      _userId,
       context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Galerie'),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await _picker.pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 80,
-                  maxWidth: 512,
-                );
-                if (image != null) await _uploadImage(image.path);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Caméra'),
-              onTap: () async {
-                Navigator.pop(context);
-                final image = await _picker.pickImage(
-                  source: ImageSource.camera,
-                  imageQuality: 80,
-                  maxWidth: 512,
-                );
-                if (image != null) await _uploadImage(image.path);
-              },
-            ),
-          ],
-        ),
-      ),
+      isMounted: () => mounted,
     );
+    if (mounted && imageUrl != null) {
+      setState(() => _imagePath = imageUrl);
+    }
+  }
+
+    Future<void> _uploadImage(String filePath) async {
+    setState(() => _isLoading = true);
+
+    final success = await HttpHelper.uploadUserImage(
+      _userId,
+      filePath,
+      context: context,
+      isMounted: () => mounted,
+    );
+
+    if (mounted) {
+      if (success) {
+        // Display local file path while waiting for BLOB conversion
+        setState(() => _imagePath = filePath);
+      }
+      setState(() => _isLoading = false);
+    }
   }
 
   void _toggleMyRecipesExpanded() {
@@ -205,10 +82,20 @@ class _ProfilePageState extends State<ProfilePage> {
         ProfilePictureContainer(
           pathImage: _imagePath,
           isEditIconVisible: true,
-          onEditPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProfileEditingPage()),
-          ),
+          onEditPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileEditingPage()),
+            ).then((_) {
+              // Reload profile image after returning from editing page
+              // Add small delay to ensure server has processed the image
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) {
+                  _loadUserProfile();
+                }
+              });
+            });
+          },
         ),
         const SizedBox(height: 10),
         Row(
