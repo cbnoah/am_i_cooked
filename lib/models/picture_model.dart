@@ -15,11 +15,11 @@ class PictureModel {
     id = json['id'];
     final imgBlobData = json['img_blob'];
     if (imgBlobData is String) {
-      // Assume it's base64 encoded
       imgBlob = base64Decode(imgBlobData);
-    } else if (imgBlobData is List<int>) {
-      // Assume it's raw bytes
-      imgBlob = Uint8List.fromList(imgBlobData);
+    } else if (imgBlobData is Map && imgBlobData['type'] == 'Buffer') {
+      imgBlob = Uint8List.fromList(List<int>.from(imgBlobData['data']));
+    } else if (imgBlobData is List) {
+      imgBlob = Uint8List.fromList(List<int>.from(imgBlobData));
     } else {
       imgBlob = null;
     }
