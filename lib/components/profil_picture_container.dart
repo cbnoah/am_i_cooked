@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_m3shapes/flutter_m3shapes.dart';
@@ -23,15 +22,6 @@ class ProfilePictureContainer extends StatelessWidget {
     if (imageBlob != null && imageBlob!.isNotEmpty) {
       return MemoryImage(imageBlob!);
     }
-
-    final path = pathImage;
-    if (path != null && path.isNotEmpty) {
-      if (path.startsWith('http://') || path.startsWith('https://')) {
-        return NetworkImage(path);
-      }
-      return FileImage(File(path));
-    }
-
     return const NetworkImage(_pathPlaceHolderImage);
   }
 
@@ -47,10 +37,7 @@ class ProfilePictureContainer extends StatelessWidget {
           height: 150,
           width: 150,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.cover,
-            ),
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
             borderRadius: BorderRadius.circular(75),
             boxShadow: [
               BoxShadow(
