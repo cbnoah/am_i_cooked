@@ -1,7 +1,8 @@
 import 'package:am_i_cooked/components/profil_picture_container.dart';
+import 'package:am_i_cooked/service/auth_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/utils/snack_bar_handler.dart';
 import 'package:am_i_cooked/utils/http_helper.dart';
 
@@ -17,7 +18,8 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
-  final int _userId = ApiConfig.defaultUserId;
+  final AuthService _authService = AuthService(Dio());
+  int? _userId;
 
   // Form controllers
   late final TextEditingController _pseudonymeController;
@@ -26,7 +28,22 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   void initState() {
     super.initState();
     _pseudonymeController = TextEditingController();
-    _loadUserProfile();
+    _initUserAndLoadProfile();
+  }
+
+  Future<void> _initUserAndLoadProfile() async {
+    final sessionId = await _authService.getSessionId();
+    final parsedUserId = sessionId != null ? int.tryParse(sessionId) : null;
+
+    if (!mounted) return;
+
+    if (parsedUserId == null) {
+      showErrorSnackbar('Session utilisateur introuvable', context);
+      return;
+    }
+
+    setState(() => _userId = parsedUserId);
+    await _loadUserProfile();
   }
 
   @override
@@ -37,8 +54,11 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
 
 
   Future<void> _loadUserProfile() async {
+    final userId = _userId;
+    if (userId == null) return;
+
     final imageUrl = await HttpHelper.loadUserProfile(
-      _userId,
+      userId,
       context: context,
       isMounted: () => mounted,
     );
@@ -49,10 +69,16 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
 
 
   Future<void> _uploadImage(String filePath) async {
+    final userId = _userId;
+    if (userId == null) {
+      showErrorSnackbar('Session utilisateur introuvable', context);
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     final success = await HttpHelper.uploadUserImage(
-      _userId,
+      userId,
       filePath,
       context: context,
       isMounted: () => mounted,
@@ -69,6 +95,12 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
 
 
   Future<void> _saveProfile() async {
+    final userId = _userId;
+    if (userId == null) {
+      showErrorSnackbar('Session utilisateur introuvable', context);
+      return;
+    }
+
     if (_pseudonymeController.text.isEmpty ) {
       showErrorSnackbar('Veuillez remplir le champ', context);
       return;
@@ -77,7 +109,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     setState(() => _isLoading = true);
 
     await HttpHelper.saveUserProfile(
-      _userId,
+      userId,
       _pseudonymeController.text,
       context: context,
       isMounted: () => mounted,
