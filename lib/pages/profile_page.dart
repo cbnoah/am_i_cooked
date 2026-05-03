@@ -9,10 +9,8 @@ import 'package:am_i_cooked/utils/profile_scrapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
 
-import '../config/api_config.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   final int? userId;
@@ -137,7 +135,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       children: [
         ProfilePictureContainer(
           imageBlob: asyncSnapshot.data?.profilePicture?.imgBlob,
-          isEditIconVisible: true,
+          isEditIconVisible: widget.userId == null,
           onEditPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const ProfileEditingPage()),
@@ -382,10 +380,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: Column(
                     children: [
                       AnimatedSize(
-                        duration: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 300),
                           opacity: _myRecipesExpanded ? 0.0 : 1.0,
                           child: _myRecipesExpanded
                               ? const SizedBox.shrink()
