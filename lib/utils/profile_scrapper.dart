@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:am_i_cooked/models/picture_model.dart';
 import 'package:am_i_cooked/models/user_model.dart';
 import 'package:dio/dio.dart';
@@ -19,12 +20,23 @@ class ProfileScrapper {
   }
 
   Future<PictureModel> fetchProfilePicture(int id) async {
-    _dio.options.headers['Content-Type'] = 'application/json';
     _dio.options.headers['access-token'] =
         'Bearer ${await TokenService.instance.getAccessToken()}';
     final response = await _dio
-        .get(ApiConfig.getProfilePictureUrl(id))
+        .get(
+          ApiConfig.getProfilePictureUrl(id),
+          options: Options(responseType: ResponseType.bytes),
+        )
         .timeout(const Duration(seconds: 15));
+
+    if (response.data is List<int>) {
+      return PictureModel(
+        imgBlob: response.data is! Uint8List
+            ? Uint8List.fromList(response.data as List<int>)
+            : response.data as Uint8List,
+      );
+    }
+
     return PictureModel.fromJson(response.data);
   }
 
