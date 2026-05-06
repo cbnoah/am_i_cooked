@@ -276,22 +276,25 @@ class _SignupPageState extends State<SignupPage> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
+                      Center(
+                        child: SizedBox(
+                          width: 220,
+                          child: Opacity(
+                            opacity: 0.45,
                             child: SocialLoginButton(
-                              label: 'Google',
-                              onTap: () {},
-                            ),
+                                label: 'Google',
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Connexion avec Google bientot disponible',
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: SocialLoginButton(
-                              label: 'Apple',
-                              onTap: () {},
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
