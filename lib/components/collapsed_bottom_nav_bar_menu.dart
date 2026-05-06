@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../pages/search_page.dart';
 import '../utils/nav_bar_switcher.dart';
 
 class CollapsedBottomNavBarMenu extends StatefulWidget {
@@ -21,10 +21,7 @@ class _CollapsedBottomNavBarMenuState extends State<CollapsedBottomNavBarMenu> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SearchPage()),
-            ),
+            onTap: () => context.push('/search'),
             child: SizedBox(
               width: MediaQuery.of(context).size.width - 90,
               child: TextField(

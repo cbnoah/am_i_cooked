@@ -12,5 +12,6 @@ ThemeData darkTheme = ThemeData(
     secondaryContainer: Color(0xFF332d41),
     surfaceContainerHigh: Color(0xFF2b2930),
     tertiaryContainer: Color(0xff3c334c),
+    outline: Color(0xff4c494e),
   ),
 );
