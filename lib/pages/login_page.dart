@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../components/login_text_field.dart';
 import '../components/social_login_button.dart';
 import 'register_page.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -265,7 +266,13 @@ class _LoginPageState extends State<LoginPage> {
                           Expanded(
                             child: SocialLoginButton(
                               label: 'Google',
-                              onTap: () {},
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Connexion Google bientôt disponible'),
+                              ),
+                            );
+                          },
                             ),
                           ),
                           const SizedBox(width: 14),

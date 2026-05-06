@@ -23,6 +23,7 @@ class ApiConfig {
   // Endpoints - Authentication
   static String getLoginUrl() => "$baseUrl/users/login";
   static String getRefreshUrl() => "$baseUrl/users/refresh";
+  static String getGoogleLoginUrl() => "$baseUrl/users/login/google";
   static String getLogoutUrl() => "$baseUrl/users/logout";
   static String getRegisterUrl() => "$baseUrl/users";
 }

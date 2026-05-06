@@ -70,7 +70,44 @@ class AuthService {
     }
     return false;
   }
+  Future<bool> loginWithGoogle(String googleToken) async {
+    try {
+      _dio.options.headers['Content-Type'] = 'application/json';
+      final response = await _dio.post(
+        ApiConfig.getGoogleLoginUrl(),
+        data: jsonEncode({'token': googleToken}),
+      );
 
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = _responseToMap(response.data);
+        final accessToken = _extractString(data, ['accessToken']);
+        final accessTokenExpiry = _extractDateTime(data, ['accessTokenExpiry']);
+        final refreshToken = _extractString(data, ['refreshToken']);
+        final refreshTokenExpiry = _extractDateTime(data, [
+          'refreshTokenExpiry',
+        ]);
+
+        if (accessToken != null &&
+            accessTokenExpiry != null &&
+            refreshToken != null &&
+            refreshTokenExpiry != null) {
+          await _tokenService.saveTokens(
+            accessToken: accessToken,
+            accessTokenExpiry: accessTokenExpiry,
+            refreshToken: refreshToken,
+            refreshTokenExpiry: refreshTokenExpiry,
+          );
+          return true;
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Google login error: $e');
+      }
+      throw Exception(e.toString());
+    }
+    return false;
+  }
   Future<bool> refreshAccessToken() async {
     try {
       final refreshToken = await _tokenService.getRefreshToken();

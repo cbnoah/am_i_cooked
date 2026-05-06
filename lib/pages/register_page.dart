@@ -281,7 +281,13 @@ class _SignupPageState extends State<SignupPage> {
                           Expanded(
                             child: SocialLoginButton(
                               label: 'Google',
-                              onTap: () {},
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Connexion Google bientôt disponible'),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 14),
