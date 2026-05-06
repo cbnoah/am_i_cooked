@@ -285,12 +285,6 @@ class _SignupPageState extends State<SignupPage> {
                             ),
                           ),
                           const SizedBox(width: 14),
-                          Expanded(
-                            child: SocialLoginButton(
-                              label: 'Apple',
-                              onTap: () {},
-                            ),
-                          ),
                         ],
                       ),
                     ],

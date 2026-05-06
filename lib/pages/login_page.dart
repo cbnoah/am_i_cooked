@@ -268,13 +268,6 @@ class _LoginPageState extends State<LoginPage> {
                               onTap: () {},
                             ),
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: SocialLoginButton(
-                              label: 'Apple',
-                              onTap: () {},
-                            ),
-                          ),
                         ],
                       ),
                     ],
