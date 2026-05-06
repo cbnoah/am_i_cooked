@@ -16,7 +16,10 @@ class RecipesPage extends StatelessWidget {
   final int cookTime;
   final int servings;
   final String difficulty;
-  final List<String> ingredient;*/
+  final List<String> ingredient;
+  final List<String> comment;
+  final List<String> userNameComment;
+
 
   const RecipesPage({
     super.key,
@@ -32,7 +35,8 @@ class RecipesPage extends StatelessWidget {
     this.ingredient = const ['Poulet', 'Oignon', 'Sel', 'Poivre'],
     */
     required this.heroTag,
-    required this.id
+    this.comment = const ['Très bon poulet', 'Mashallah','aze','flop plus ratio'],
+    this.userNameComment = const ['Julie', 'Paul','JCVD','SCH']
   });
 
   @override
@@ -85,13 +89,15 @@ class RecipesPage extends StatelessWidget {
             RecipeCriteriaBar(criteria: resolvedCriteria),
             const SizedBox(height: 8),
             RecipeDetails(
-              recipeName: resolvedTitle,
-              author: resolvedIdAuthor.toString(),
-              prepTime: resolvedPrepTime,
-              cookTime: resolvedCookTime,
-              servings: 0,
-              difficulty: resolvedDifficulty,
-              ingredient: ["test", "test"],
+              recipeName: recipeTitle,
+              author: author,
+              prepTime: prepTime,
+              cookTime: cookTime,
+              servings: servings,
+              difficulty: difficulty,
+              ingredient: ingredient,
+              comment: comment,
+              userNameComment: userNameComment,
             ),
           ],
         ),

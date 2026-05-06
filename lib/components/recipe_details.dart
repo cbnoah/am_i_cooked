@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../pages/profile_page.dart' as profile_page ;
+
+
+
+
+
 class RecipeDetails extends StatelessWidget {
 
 
@@ -32,6 +38,51 @@ class RecipeDetails extends StatelessWidget {
     );
   }
 
+
+  void _showCommentsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Commentaires'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: comment.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(comment[index]),
+
+                  subtitle:
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => profile_page.ProfilePage()),
+                      );
+                    },
+                    child: Text(
+                      'by $userNameComment',
+
+                      ),
+                    ),
+                  leading: const Icon(Icons.comment),
+                );
+
+              },
+            )
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            )
+            ],
+        );
+      },
+    );
+  }
+
   final String recipeName;
   final String author;
   final int prepTime;
@@ -39,6 +90,9 @@ class RecipeDetails extends StatelessWidget {
   final int servings;
   final String difficulty;
   final List<String> ingredient;
+  final List<String> comment ;
+  final List<String> userNameComment ;
+
 
 
   const RecipeDetails({
@@ -50,6 +104,8 @@ class RecipeDetails extends StatelessWidget {
     required this.servings,
     required this.difficulty,
     required this.ingredient,
+    required this.comment,
+    required this.userNameComment
 
   });
 
@@ -140,6 +196,14 @@ class RecipeDetails extends StatelessWidget {
               child: const Text('Voir les ingrédients'),
             ),
           ),
+          SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _showCommentsDialog(context),
+              child: const Text('Voir les commentaires'),
+            ),
+          )
         ],
       ),
 

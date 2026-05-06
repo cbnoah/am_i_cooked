@@ -7,9 +7,6 @@ class Recipe {
   const Recipe({required this.title, required this.imageAssets});
 }
 
-@Deprecated(
-  "DO NOT USE THIS WIDGET, use RecipeContainer instead, this widget will be removed in the future",
-)
 class RecipeCard extends StatelessWidget {
   const RecipeCard({
     super.key,
