@@ -1,11 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:am_i_cooked/components/profil_picture_container.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
+import 'package:am_i_cooked/utils/profile_scrapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:am_i_cooked/utils/snack_bar_handler.dart';
 import 'package:am_i_cooked/utils/http_helper.dart';
-
 
 class ProfileEditingPage extends StatefulWidget {
   const ProfileEditingPage({super.key});
@@ -15,7 +17,8 @@ class ProfileEditingPage extends StatefulWidget {
 }
 
 class _ProfileEditingPageState extends State<ProfileEditingPage> {
-  String _imagePath = "https://i.redd.it/jqop4dqqmdx91.jpg";
+  Uint8List? _currentImageBlob;
+  String? _pendingImagePath;
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
   final AuthService _authService = AuthService(Dio());
@@ -23,6 +26,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
 
   // Form controllers
   late final TextEditingController _pseudonymeController;
+  String _originalUsername = '';
 
   @override
   void initState() {
@@ -52,47 +56,25 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     super.dispose();
   }
 
-
   Future<void> _loadUserProfile() async {
     final userId = _userId;
     if (userId == null) return;
 
-    final imageUrl = await HttpHelper.loadUserProfile(
-      userId,
-      context: context,
-      isMounted: () => mounted,
-    );
-    if (mounted && imageUrl != null) {
-      setState(() => _imagePath = imageUrl);
-    }
-  }
-
-
-  Future<void> _uploadImage(String filePath) async {
-    final userId = _userId;
-    if (userId == null) {
-      showErrorSnackbar('Session utilisateur introuvable', context);
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    final success = await HttpHelper.uploadUserImage(
-      userId,
-      filePath,
-      context: context,
-      isMounted: () => mounted,
-    );
-
-    if (mounted) {
-      if (success) {
-        // Display local file path while waiting for BLOB conversion
-        setState(() => _imagePath = filePath);
+    try {
+      final scrapper = ProfileScrapper();
+      final user = await scrapper.fetchAllUserData(userId);
+      if (mounted) {
+        setState(() {
+          _currentImageBlob = user.profilePicture?.imgBlob;
+          _pseudonymeController.text = user.username ?? '';
+          // Store original image blob
+          _originalUsername = user.username ?? ''; // Store original username
+        });
       }
-      setState(() => _isLoading = false);
+    } catch (e) {
+      debugPrint('Error loading user profile: $e');
     }
   }
-
 
   Future<void> _saveProfile() async {
     final userId = _userId;
@@ -100,26 +82,50 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
       showErrorSnackbar('Session utilisateur introuvable', context);
       return;
     }
-
-    if (_pseudonymeController.text.isEmpty ) {
-      showErrorSnackbar('Veuillez remplir le champ', context);
+    if (_pseudonymeController.text.isEmpty && _pendingImagePath == null) {
+      showErrorSnackbar('Veuillez remplir modifier un des champs', context);
       return;
     }
 
     setState(() => _isLoading = true);
 
-    await HttpHelper.saveUserProfile(
-      userId,
-      _pseudonymeController.text,
-      context: context,
-      isMounted: () => mounted,
-    );
+    // Upload image if a new one was selected
+    if (_pendingImagePath != null) {
+      final imageSuccess = await HttpHelper.uploadUserImage(
+        userId,
+        _pendingImagePath!,
+        context: context,
+        isMounted: () => mounted,
+      );
+      if (!imageSuccess) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+        return; // Stop if image upload failed
+      }
+      _pendingImagePath = null; // Clear pending image after successful upload
+    }
 
+    if (_pseudonymeController.text != _originalUsername) {
+      final profileSuccess = await HttpHelper.saveUserProfile(
+        userId,
+        _pseudonymeController.text,
+        context: context,
+        isMounted: () => mounted,
+      );
+      if (!profileSuccess) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+        return; // Stop if profile save failed
+      }
+    }
     if (mounted) {
       setState(() => _isLoading = false);
+      // Update originals after successful save
+      _originalUsername = _pseudonymeController.text;
     }
   }
-
 
   Future<void> _pickImage() async {
     showModalBottomSheet(
@@ -138,7 +144,18 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                   imageQuality: 80,
                   maxWidth: 512,
                 );
-                if (image != null) await _uploadImage(image.path);
+                if (image != null) {
+                  try {
+                    final file = File(image.path);
+                    final bytes = await file.readAsBytes();
+                    setState(() {
+                      _currentImageBlob = bytes;
+                      _pendingImagePath = image.path;
+                    });
+                  } catch (e) {
+                    debugPrint('Error reading selected image: $e');
+                  }
+                }
               },
             ),
             ListTile(
@@ -151,7 +168,18 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                   imageQuality: 80,
                   maxWidth: 512,
                 );
-                if (image != null) await _uploadImage(image.path);
+                if (image != null) {
+                  try {
+                    final file = File(image.path);
+                    final bytes = await file.readAsBytes();
+                    setState(() {
+                      _currentImageBlob = bytes;
+                      _pendingImagePath = image.path;
+                    });
+                  } catch (e) {
+                    debugPrint('Error reading selected image: $e');
+                  }
+                }
               },
             ),
           ],
@@ -160,12 +188,11 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
     );
   }
 
-
   Widget _buildProfileSection() {
     return Column(
       children: [
         ProfilePictureContainer(
-          pathImage: _imagePath,
+          imageBlob: _currentImageBlob,
           isEditIconVisible: false,
           onEditPressed: _isLoading ? null : _pickImage,
         ),
@@ -192,7 +219,7 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          // Add good color for AppBar
+        // Add good color for AppBar
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back),
@@ -277,42 +304,49 @@ class _ProfileEditingPageState extends State<ProfileEditingPage> {
                     ),
                     Container(
                       padding: const EdgeInsets.only(top: 15.0),
-                      child: Center(
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _saveProfile,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40.0,
-                              vertical: 25.0,
-                            ),
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.save,
-                                size: 24,
-                                color: Theme.of(context).colorScheme.onPrimary,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _isLoading ? null : _saveProfile,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 30.0,
+                                vertical: 20.0,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Sauvegarder',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w700,
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.save,
+                                  size: 20,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Sauvegarder',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'Nunito',
+                                    fontWeight: FontWeight.w700,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ],
