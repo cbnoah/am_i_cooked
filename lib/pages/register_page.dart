@@ -276,16 +276,19 @@ class _SignupPageState extends State<SignupPage> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SocialLoginButton(
-                              label: 'Google',
-                              onTap: () {},
+                      Center(
+                        child: SizedBox(
+                          width: 220,
+                          child: Opacity(
+                            opacity: 0.45,
+                            child: IgnorePointer(
+                              child: SocialLoginButton(
+                                label: 'Google',
+                                onTap: () {},
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 14),
-                        ],
+                        ),
                       ),
                     ],
                   ),
