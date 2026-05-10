@@ -45,7 +45,12 @@ class _ProfilePageState extends State<ProfilePage> {
       final sessionId = await _authService.getSessionId();
       if (sessionId != null) {
         _userId = int.tryParse(sessionId);
-  Future<void> _loadUserProfile() async {
+      }
+    }
+    await  _loadUserProfile();
+  }
+
+      Future<void> _loadUserProfile() async {
     if (!mounted) return;
 
     setState(() => _isLoading = true);
@@ -53,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       // 1. Get user data to find profile picture ID
       final userResponse = await http
-          .get(Uri.parse(ApiConfig.getUserUrl(_userId)))
+          .get(Uri.parse(ApiConfig.getUserUrl(_userId!)))
           .timeout(const Duration(seconds: 15));
 
       if (!mounted) return;
@@ -77,17 +82,17 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       } else {
         if (mounted) {
-          _showErrorSnackbar('Error: ${userResponse.statusCode}');
+          showErrorSnackbar('Error: ${userResponse.statusCode}');
         }
       }
     } on SocketException catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
+        showErrorSnackbar('Network error: ${e.message}');
       }
       debugPrint('Socket error: $e');
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Error: $e');
+        showErrorSnackbar('Error: $e');
       }
       debugPrint('Error loading profile : $e');
     } finally {
@@ -134,18 +139,18 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       } else {
         if (mounted) {
-          _showErrorSnackbar('Upload error: ${response.statusCode}');
+          showErrorSnackbar('Upload error: ${response.statusCode}');
         }
         debugPrint('Error uploading image : $body');
       }
     } on SocketException catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
+        showErrorSnackbar('Network error: ${e.message}');
       }
       debugPrint('Socket error upload: $e');
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Error: $e');
+        showErrorSnackbar('Error: $e');
       }
       debugPrint('Exception upload : $e');
     } finally {
@@ -155,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _showErrorSnackbar(String message) {
+  void showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),

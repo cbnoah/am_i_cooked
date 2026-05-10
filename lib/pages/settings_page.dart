@@ -1,5 +1,6 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
+import 'package:am_i_cooked/utils/auth_layout.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -144,13 +145,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: Colors.red,
                   ),
                 ),
-                onTap: () async {
-                  await _authService.logout();
+                  onTap: () async {
+                    await _authService.logout();
 
-                  if (mounted) {
-                    Navigator.pop(context);
+                    if (!mounted) return;
+
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const AuthLayout(),
+                      ),
+                          (route) => false,
+                    );
+
                   }
-                },
               ),
             ],
           ),
