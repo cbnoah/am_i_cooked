@@ -1,3 +1,5 @@
+import 'package:am_i_cooked/service/auth_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenService {
@@ -20,6 +22,14 @@ class TokenService {
   Stream<String?> get accessTokenStream async* {
     while (true) {
       yield await getAccessToken();
+      if (await isRefreshTokenExpired()) {
+        print("refreseh token expired, clearing tokens");
+        clearTokens();
+      }
+      if (await isAccessTokenExpired()) {
+        print("access token expired, refreshing");
+        await accessAccessToken();
+      }
       await Future.delayed(const Duration(seconds: 2));
       print("looped");
     }
@@ -122,5 +132,13 @@ class TokenService {
     await _storage.delete(key: _refreshTokenKey);
     await _storage.delete(key: _accessExpiresAtKey);
     await _storage.delete(key: _refreshExpiresAtKey);
+  }
+
+  Future<void> accessAccessToken() async {
+    AuthService authService = AuthService(Dio());
+    final success = await authService.refreshAccessToken();
+    if (!success) {
+      await clearTokens();
+    }
   }
 }
