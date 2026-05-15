@@ -64,7 +64,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  void _showErrorSnackbar(String message) {
+  void showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
