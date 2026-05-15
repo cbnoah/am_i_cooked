@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:dio/dio.dart';
@@ -11,6 +9,47 @@ import '../service/token_service.dart';
 final recipesProvider =
     AsyncNotifierProvider<RecipesNotifier, List<RecipeModel>>(
       RecipesNotifier.new,
+    );
+
+final userRecipesProvider =
+    FutureProvider.family<List<RecipeModel>, int>(
+      (ref, userId) async {
+      final dio = Dio();
+      dio.options.headers['Content-Type'] = 'application/json';
+      dio.options.headers['access-token'] =
+        'Bearer ${await TokenService.instance.getAccessToken()}';
+
+      try {
+        final response = await dio.get(ApiConfig.getRecipesUrl(userId));
+        if (response.statusCode != 200) {
+          throw Exception('Failed to load user recipes data');
+        }
+
+        if (response.data is! List<dynamic>) {
+          throw Exception('Invalid user recipes payload');
+        }
+
+        final recipes = <RecipeModel>[];
+
+        for (final item in response.data) {
+          if (item is! Map<String, dynamic>) continue;
+          try {
+            recipes.add(RecipeModel.fromJson(item));
+          } on FormatException {
+            if (kDebugMode) {
+              print('Error when receiving Recipe data');
+            }
+          }
+        }
+
+        return recipes;
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error fetching user recipes: $e');
+        }
+        throw Exception('Failed to load user recipes data');
+      }
+      },
     );
 
 final recipeByIdProvider = Provider.family<RecipeModel?, int>((ref, recipeId) {

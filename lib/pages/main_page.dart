@@ -30,7 +30,7 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   String _imagePathFor(RecipeModel recipe) {
     return recipe.idPicture != null
-        ? ApiConfig.getPictureUrl(recipe.idPicture!)
+        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
         : _placeholderImageUrl;
   }
 

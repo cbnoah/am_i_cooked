@@ -1,3 +1,5 @@
+import 'package:am_i_cooked/models/picture_model.dart';
+
 class UserModel {
   int? id;
   String? username;
@@ -7,6 +9,7 @@ class UserModel {
   int? lVL;
   DateTime? createdAt;
   DateTime? updatedAt;
+  PictureModel? profilePicture;
 
   UserModel({
     this.id,
@@ -17,6 +20,7 @@ class UserModel {
     this.lVL,
     this.createdAt,
     this.updatedAt,
+    this.profilePicture,
   });
 
   UserModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +32,9 @@ class UserModel {
     lVL = json['LVL'];
     createdAt = _parseDate(json['created_at']);
     updatedAt = _parseDate(json['updated_at']);
+    if (json['profile_picture'] != null) {
+      profilePicture = PictureModel.fromJson(json['profile_picture']);
+    }
   }
 
   Map<String, dynamic> toJson() {

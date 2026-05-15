@@ -1,20 +1,18 @@
 class ApiConfig {
   // Server URL
   static const String baseUrl = String.fromEnvironment("API_URL");
-
-  // ID user by default (à remplacer par une gestion d'authentification plus tard)
-  static const int defaultUserId = 1;
   
   // Timeouts (en secondes)
   static const int connectTimeout = 15;
   static const int uploadTimeout = 30;
   
   // Endpoints - Users
+  static String getUsersUrl() => "$baseUrl/users";
   static String getUserUrl(int userId) => "$baseUrl/users/$userId";
   
   // Endpoints - Pictures
-  static String getUploadUrl(int userId) => "$baseUrl/users/$userId/picture";
-  static String getPictureUrl(int pictureId) => "$baseUrl/pictures/$pictureId";
+  static String getProfilePictureUrl(int userId) => "${getUsersUrl()}/$userId/picture";
+  static String getRecipePictureUrl(int recipeId) => "${getRecipeUrl(recipeId)}/picture";
   
   // Endpoints - Recipes
   static String getAllRecipesUrl() => "$baseUrl/recipes";

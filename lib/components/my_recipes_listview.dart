@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class MyRecipesListview extends ConsumerStatefulWidget {
+  final int userId;
+  final bool isOthersProfile;
   final dynamic toggleMyRecipesExpanded;
   final dynamic getMyRecipesExpanded;
   final BuildContext? context;
@@ -16,6 +18,8 @@ class MyRecipesListview extends ConsumerStatefulWidget {
     required this.toggleMyRecipesExpanded,
     required this.getMyRecipesExpanded,
     this.context,
+    required this.userId,
+    required this.isOthersProfile,
   });
 
   @override
@@ -45,7 +49,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
 
   String _imagePathFor(RecipeModel recipe) {
     return recipe.idPicture != null
-        ? ApiConfig.getPictureUrl(recipe.idPicture!)
+        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
         : _placeholderImageUrl;
   }
 
@@ -77,7 +81,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
 
   @override
   Widget build(BuildContext context) {
-    final recipesAsync = ref.watch(recipesProvider);
+    final recipesAsync = ref.watch(userRecipesProvider(widget.userId));
 
     return Container(
       width: double.infinity,
@@ -123,63 +127,90 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
             Expanded(
               child: recipesAsync.when(
                 data: (recipes) => recipes.isEmpty
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        spacing: 20,
-                        children: [
-                          Text(
-                            "Vous n'avez créé aucune recette pour le moment 😔",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "Nunito",
-                              fontWeight: FontWeight.w300,
-                              fontStyle: FontStyle.italic,
-                              fontSize: 20,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          FilledButton(
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all<Color>(
-                                Theme.of(context).colorScheme.primaryContainer,
-                              ),
-                              padding: WidgetStateProperty.all<EdgeInsets>(
-                                const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                  vertical: 12.0,
-                                ),
-                              ),
-                            ),
-                            onPressed: () => context.push('/new'),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ? widget.isOthersProfile
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.add_circle_outline,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimaryContainer,
-                                  size: 30,
-                                ),
                                 Text(
-                                  "Créez votre première recette",
+                                  "Cet utilisateur n'a pas créé de recettes",
                                   style: TextStyle(
-                                    fontFamily: "nunito",
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 16,
+                                    fontFamily: "Nunito",
+                                    fontWeight: FontWeight.w300,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 20,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onPrimaryContainer,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 20,
+                              children: [
+                                Text(
+                                  "Vous n'avez créé aucune recette pour le moment 😔",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: "Nunito",
+                                    fontWeight: FontWeight.w300,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 20,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ),
+                                FilledButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStateProperty.all<Color>(
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.primaryContainer,
+                                        ),
+                                    padding:
+                                        WidgetStateProperty.all<EdgeInsets>(
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 16.0,
+                                            vertical: 12.0,
+                                          ),
+                                        ),
+                                  ),
+                                  onPressed: () => context.push('/new'),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Icon(
+                                        Icons.add_circle_outline,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimaryContainer,
+                                        size: 30,
+                                      ),
+                                      Text(
+                                        "Créez votre première recette",
+                                        style: TextStyle(
+                                          fontFamily: "nunito",
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimaryContainer,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
-                            ),
-                          ),
-                        ],
-                      )
+                            )
                     : Padding(
                         padding: const EdgeInsets.only(top: 16.0),
                         child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           scrollDirection: Axis.vertical,
                           itemCount: recipes.length,
                           separatorBuilder: (context, index) =>
