@@ -1,6 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
 import 'package:am_i_cooked/utils/auth_layout.dart';
+import 'package:am_i_cooked/pages/account_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -108,12 +109,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  Icons.person_outline,
-                  color: cs.onSurface,
-                ),
                 title: Text(
-                  'Compte',
+                  'Mot de passe',
                   style: TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 18,
@@ -123,9 +120,33 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 trailing: Icon(
                   Icons.chevron_right,
-                  color: cs.onSurfaceVariant,
+                  color: cs.onSurface,
+                  size: 34,
                 ),
-                onTap: () {},
+                onTap: () {
+                  // TODO: ouvrir PasswordPage
+                },
+              ),
+
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  'Email',
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: cs.onSurface,
+                  size: 34,
+                ),
+                onTap: () {
+                  // TODO: ouvrir EmailPage
+                },
               ),
 
               const Spacer(),
