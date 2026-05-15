@@ -1,7 +1,8 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
 import 'package:am_i_cooked/utils/auth_layout.dart';
-import 'package:am_i_cooked/pages/account_page.dart';
+import 'package:am_i_cooked/pages/password_page.dart';
+import 'package:am_i_cooked/pages/email_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -124,7 +125,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   size: 34,
                 ),
                 onTap: () {
-                  // TODO: ouvrir PasswordPage
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const PasswordPage(),
+                  ),
+                  );
                 },
               ),
 
@@ -145,7 +151,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   size: 34,
                 ),
                 onTap: () {
-                  // TODO: ouvrir EmailPage
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const EmailPage(),
+                    ),
+                  );
                 },
               ),
 
