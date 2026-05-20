@@ -185,7 +185,6 @@ class _EmailPageState extends State<EmailPage> {
         fillColor: cs.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide.none,
         ),
       ),
     );

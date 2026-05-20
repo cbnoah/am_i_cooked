@@ -231,7 +231,6 @@ class _PasswordPageState extends State<PasswordPage> {
         fillColor: cs.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide.none,
         ),
       ),
     );
