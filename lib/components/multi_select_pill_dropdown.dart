@@ -51,7 +51,7 @@ class _MultiSelectPillDropdownState<T>
                     selectedItems.isEmpty
                         ? widget.hintText
                         : '${selectedItems.length} sélectionné(s)',
-                    style: widget.hintStyle.copyWith(color: Colors.white),
+                    style: widget.hintStyle.copyWith(color: Theme.of(context).colorScheme.onPrimary),
                   ),
                 ),
               ),
@@ -68,7 +68,7 @@ class _MultiSelectPillDropdownState<T>
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setStateDialog) => AlertDialog(
-          backgroundColor: const Color(0xFFF3F1FA),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
