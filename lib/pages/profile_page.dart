@@ -6,6 +6,7 @@ import 'package:am_i_cooked/components/profil_picture_container.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
 import 'package:am_i_cooked/utils/profile_scrapper.dart';
+import 'package:am_i_cooked/pages/settings_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,7 +75,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  void _showSuccessSnackbar(String message) {
+  void showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -112,12 +113,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       return await scrapper.fetchAllUserData(id);
     } on SocketException catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Network error: ${e.message}');
+        showErrorSnackbar('Network error: ${e.message}');
       }
       debugPrint('Socket error: $e');
     } catch (e) {
       if (mounted) {
-        _showErrorSnackbar('Error: $e');
+        showErrorSnackbar('Error: $e');
       }
       debugPrint('Error loading profile : $e');
     }
@@ -193,8 +194,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               centerTitle: true,
               actions: [
                 IconButton(
-                  onPressed: () async {
-                    await _authService.logout();
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
                   },
                   icon: const Icon(Icons.settings_outlined),
                 ),
