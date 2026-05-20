@@ -39,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'Paramètres',
+          'Parametres',
           style: TextStyle(
             fontFamily: 'bbh_sans_hegarty',
             fontSize: 24,
