@@ -1,7 +1,7 @@
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
-import 'package:am_i_cooked/providers/bookmarks_provider.dart';
+import 'package:am_i_cooked/providers/favorites_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -52,7 +52,8 @@ class _MainPageState extends ConsumerState<MainPage> {
         heroTag: heroTag,
         onTap: () => context.push('/recipe/$index'),
         onBookmarkChanged: () async {
-          final bookmarkActions = ref.read(bookmarkActionsProvider(userId));
+          final bookmarkActions =
+              ref.read(bookmarkActionsProvider(userId));
           await bookmarkActions.toggleBookmark(recipe.id!);
         },
       );
@@ -93,33 +94,32 @@ class _MainPageState extends ConsumerState<MainPage> {
 
           final bookmarksAsync = ref.watch(bookmarksProvider(userId));
 
-          return recipesAsync.when(
-            data: (recipes) {
-              print('MainPage: Recipes loaded, count=${recipes.length}');
-              final recommendedCarousel = recipes.take(5).toList();
-              final trendsCarousel = recipes.take(5).toList();
+           return recipesAsync.when(
+             data: (recipes) {
+               print('MainPage: Recipes loaded, count=${recipes.length}');
+               final recommendedCarousel = recipes.take(5).toList();
+               final trendsCarousel = recipes.take(5).toList();
 
-              return bookmarksAsync.when(
-                data: (bookmarks) {
-                  print(
-                    'MainPage: Bookmarks loaded, count=${bookmarks.length}, ids=$bookmarks',
-                  );
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      print('Refreshing recipes and bookmarks...');
-                      try {
-                        ref.invalidate(recipesProvider);
-                        ref.invalidate(bookmarksProvider(userId));
+                return bookmarksAsync.when(
+                  data: (bookmarks) {
+                    print('MainPage: Bookmarks loaded, count=${bookmarks.length}, ids=$bookmarks');
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        print('Refreshing recipes and bookmarks...');
+                        try {
+                          ref.invalidate(recipesProvider);
+                          ref.invalidate(bookmarksProvider(userId));
 
-                        ref.read(recipesProvider);
-                        ref.read(bookmarksProvider(userId));
-                        await Future.delayed(const Duration(milliseconds: 100));
+                          ref.read(recipesProvider);
+                          ref.read(bookmarksProvider(userId));
 
-                        print('Refresh completed successfully');
-                      } catch (e) {
-                        print('Error during refresh: $e');
-                      }
-                    },
+                          await Future.delayed(const Duration(milliseconds: 100));
+
+                          print('Refresh completed successfully');
+                        } catch (e) {
+                          print('Error during refresh: $e');
+                        }
+                      },
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Padding(
@@ -131,7 +131,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Enfin de retour 👋!',
+                              'Enfin de retour 👋',
                               style: TextStyle(
                                 fontFamily: 'nunito',
                                 fontWeight: FontWeight.w900,
@@ -177,15 +177,15 @@ class _MainPageState extends ConsumerState<MainPage> {
                               child: recommendedCarousel.isEmpty
                                   ? Center(
                                       child: Text(
-                                        "Aucune recette trouvée 😢",
+                                        "Aucune recette trouvée ",
                                         style: TextStyle(
                                           fontFamily: "Nunito",
                                           fontWeight: FontWeight.w300,
                                           fontStyle: FontStyle.italic,
                                           fontSize: 20,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ),
                                     )
@@ -228,15 +228,15 @@ class _MainPageState extends ConsumerState<MainPage> {
                               child: trendsCarousel.isEmpty
                                   ? Center(
                                       child: Text(
-                                        "Aucune recette trouvée 😢",
+                                        "Aucune recette trouvée ",
                                         style: TextStyle(
                                           fontFamily: "Nunito",
                                           fontWeight: FontWeight.w300,
                                           fontStyle: FontStyle.italic,
                                           fontSize: 20,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ),
                                     )
@@ -259,7 +259,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                     ),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Center(
                   child: Text(
                     'Erreur lors du chargement des bookmarks',
