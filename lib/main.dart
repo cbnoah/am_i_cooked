@@ -43,7 +43,7 @@ void main() async {
       ),
       GoRoute(path: '/search', builder: (context, state) => SearchPage()),
       GoRoute(path: '/new', builder: (context, state) => const Scaffold(body: Center(child: Text('New Recipe Page')))),
-      GoRoute(path: '/bookmarks', builder: (context, state) => const Scaffold(body: Center(child: Text('Bookmarks Page')))),
+      GoRoute(path: '/favorites', builder: (context, state) => FavoritesPage()),
     ],
     initialLocation: '/',
   );
