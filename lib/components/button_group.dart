@@ -55,7 +55,7 @@ class _ButtonGroupState extends State<ButtonGroup> {
         ),
         FilledButton(
           onPressed: () {
-            context.push("/bookmarks");
+            context.push("/favorites");
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size(0, buttonHeight),

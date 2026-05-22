@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:am_i_cooked/pages/favorites_page.dart';
 import 'package:am_i_cooked/pages/profile_page.dart';
 import 'package:am_i_cooked/pages/recipes_page.dart';
 import 'package:am_i_cooked/pages/search_page.dart';
@@ -43,7 +44,7 @@ void main() async {
       ),
       GoRoute(path: '/search', builder: (context, state) => SearchPage()),
       GoRoute(path: '/new', builder: (context, state) => const Scaffold(body: Center(child: Text('New Recipe Page')))),
-      GoRoute(path: '/bookmarks', builder: (context, state) => const Scaffold(body: Center(child: Text('Bookmarks Page')))),
+      GoRoute(path: '/favorites', builder: (context, state) => FavoritesPage()),
     ],
     initialLocation: '/',
   );
