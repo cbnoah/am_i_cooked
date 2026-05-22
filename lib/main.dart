@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:am_i_cooked/pages/favorites_page.dart';
 import 'package:am_i_cooked/pages/profile_page.dart';
 import 'package:am_i_cooked/pages/recipes_page.dart';
 import 'package:am_i_cooked/pages/search_page.dart';
