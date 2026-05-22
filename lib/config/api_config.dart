@@ -24,4 +24,9 @@ class ApiConfig {
   static String getRefreshUrl() => "$baseUrl/users/refresh";
   static String getLogoutUrl() => "$baseUrl/users/logout";
   static String getRegisterUrl() => "$baseUrl/users";
+
+  // Endpoints - Favorites
+  static String getFavoritesUrl() => "$baseUrl/favorites";
+  static String getUserFavoritesUrl(int userId) => "$baseUrl/favorites/users/$userId";
+  static String getSpecificFavoriteUrl(int userId, int recipeId) => "$baseUrl/favorites/users/$userId/recipes/$recipeId";
 }
