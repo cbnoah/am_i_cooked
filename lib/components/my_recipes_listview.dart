@@ -1,10 +1,10 @@
-import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/components/recipe_container.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:typed_data';
 
 class MyRecipesListview extends ConsumerStatefulWidget {
   final int userId;
@@ -47,10 +47,8 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
     return 'my-recipes-${recipe.id ?? index}';
   }
 
-  String _imagePathFor(RecipeModel recipe) {
-    return recipe.idPicture != null
-        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
-        : _placeholderImageUrl;
+  Uint8List? _imagePathFor(RecipeModel recipe) {
+    return recipe.recipePicture?.imgBlob;
   }
 
   Widget _buildRecipeTile(RecipeModel recipe, int index) {
@@ -61,7 +59,7 @@ class _MyRecipesListviewState extends ConsumerState<MyRecipesListview> {
       height: 200,
       child: RecipeContainer(
         key: ValueKey(heroTag),
-        path: _imagePathFor(recipe),
+        blobImage: _imagePathFor(recipe),
         isBookmarked: _bookmarks[bookmarkKey] ?? true,
         showBookmarkIcon: true,
         recipeTitle: recipe.displayName,
