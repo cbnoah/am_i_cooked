@@ -143,6 +143,17 @@ class RecipesNotifier extends AsyncNotifier<List<RecipeModel>> {
     }
   }
 
+  Future<void> deleteRecipe(int id) async {
+    state = const AsyncValue.loading();
+    try {
+      await _recipeService.deleteFullRecipe(id);
+      ref.invalidateSelf();
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+      rethrow;
+    }
+  }
+
   Future<List<RecipeModel>> _fetchRecipes() async {
     _dio.options.headers['Content-Type'] = 'application/json';
     _dio.options.headers['access-token'] =
