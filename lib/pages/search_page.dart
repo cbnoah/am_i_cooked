@@ -1,4 +1,3 @@
-import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/pages/recipes_page.dart';
 import 'package:flutter/material.dart';
 import 'package:am_i_cooked/components/multi_select_pill_dropdown.dart';
@@ -6,6 +5,7 @@ import 'package:am_i_cooked/data/search_data.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:typed_data';
 
 import '../components/recipe_container.dart';
 
@@ -22,9 +22,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   List<String> selectedRegimes = [];
   List<String> selectedAllergenes = [];
 
-  static const String _placeholderImageUrl =
-      'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg';
-
   String _bookmarkKeyFor(RecipeModel recipe, String fallback) {
     return recipe.id?.toString() ?? recipe.name ?? fallback;
   }
@@ -33,10 +30,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return 'search-${recipe.id ?? index}';
   }
 
-  String _imagePathFor(RecipeModel recipe) {
-    return recipe.idPicture != null
-        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
-        : _placeholderImageUrl;
+  Uint8List? _imagePathFor(RecipeModel recipe) {
+    return recipe.recipePicture?.imgBlob;
   }
 
   Widget _buildRecipeTile(RecipeModel recipe, int index) {
@@ -47,7 +42,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       height: 200,
       child: RecipeContainer(
         key: ValueKey(heroTag),
-        path: _imagePathFor(recipe),
+        blobImage: _imagePathFor(recipe),
         isBookmarked: _bookmarks[bookmarkKey] ?? true,
         showBookmarkIcon: true,
         recipeTitle: recipe.displayName,
@@ -61,7 +56,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => RecipesPage(recipe: recipe, heroTag: heroTag, id: 0,),
+              builder: (_) =>
+                  RecipesPage(recipe: recipe, heroTag: heroTag, id: 0),
             ),
           );
         },
