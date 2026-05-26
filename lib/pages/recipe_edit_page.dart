@@ -8,6 +8,7 @@ import 'package:am_i_cooked/utils/snack_bar_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RecipeEditPage extends ConsumerStatefulWidget {
@@ -51,7 +52,7 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                 recipeData.preparationTime?.toString() ?? '';
             difficulty = recipeData.difficulty;
             _currentImageBlob = recipeData.recipePicture?.imgBlob;
-            // Note: In a real app, we'd fetch ingredients for this recipe here
+            ingredientsList = List.from(recipeData.ingredients ?? []);
           });
         }
       });
@@ -184,8 +185,30 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted)
-        showErrorSnackbar("Erreur lors de l'enregistrement : $e", context);
+      if (mounted) {
+        showErrorSnackbar("Erreur lors de l'enregistrement", context);
+      }
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _deleteRecipe() async {
+    if (widget.id == null) return;
+
+    setState(() => isLoading = true);
+
+    try {
+      await ref.read(recipesProvider.notifier).deleteRecipe(widget.id!);
+      if (mounted) {
+        showSuccessSnackbar("Recette supprimée avec succès !", context);
+        context.go("/");
+      }
+    } catch (e) {
+      print(e);
+      if (mounted) {
+        showErrorSnackbar("Erreur lors de la suppression", context);
+      }
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -220,34 +243,36 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                                 )
                               : null,
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.photo_camera,
-                                size: 45.0,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                              ),
-                              Text(
-                                widget.id == null
-                                    ? "Ajouter une photo"
-                                    : "Modifier la photo",
-                                style: TextStyle(
-                                  fontFamily: "nunito",
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
+                        child: _currentImageBlob == null
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.photo_camera,
+                                      size: 45.0,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                                    Text(
+                                      widget.id == null
+                                          ? "Ajouter une photo"
+                                          : "Modifier la photo",
+                                      style: TextStyle(
+                                        fontFamily: "nunito",
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
+                              )
+                            : null,
                       ),
                     ),
                     Positioned(
@@ -364,9 +389,47 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                                       widget.id == null
                                           ? "CRÉER LA RECETTE"
                                           : "METTRE À JOUR",
+                                      style: TextStyle(
+                                        fontFamily: "Nunito",
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.surface,
+                                      ),
                                     ),
                             ),
                           ),
+                          ?widget.id != null
+                              ? SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                    ),
+                                    onPressed: isLoading ? null : _deleteRecipe,
+                                    child: isLoading
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.white,
+                                          )
+                                        : Text(
+                                            "SUPPRIMER LA RECETTE",
+                                            style: TextStyle(
+                                              fontFamily: "Nunito",
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.surface,
+                                            ),
+                                          ),
+                                  ),
+                                )
+                              : null,
                         ],
                       ),
                     ),
