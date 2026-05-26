@@ -79,7 +79,7 @@ class RecipesNotifier extends AsyncNotifier<List<RecipeModel>> {
   final Dio _dio = Dio();
   final RecipeService _recipeService = RecipeService();
 
-  Future<void> createRecipe({
+  Future<RecipeModel> createRecipe({
     required String name,
     String? description,
     int? cookingTime,
@@ -92,7 +92,7 @@ class RecipesNotifier extends AsyncNotifier<List<RecipeModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      await _recipeService.createFullRecipe(
+      final recipe = await _recipeService.createFullRecipe(
         name: name,
         description: description,
         cookingTime: cookingTime,
@@ -104,13 +104,14 @@ class RecipesNotifier extends AsyncNotifier<List<RecipeModel>> {
         ingredients: ingredients,
       );
       ref.invalidateSelf();
+      return recipe;
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
       rethrow;
     }
   }
 
-  Future<void> updateRecipe({
+  Future<RecipeModel> updateRecipe({
     required int id,
     required String name,
     String? description,
@@ -123,7 +124,7 @@ class RecipesNotifier extends AsyncNotifier<List<RecipeModel>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      await _recipeService.updateFullRecipe(
+      final recipe = await _recipeService.updateFullRecipe(
         id: id,
         name: name,
         description: description,
@@ -135,6 +136,7 @@ class RecipesNotifier extends AsyncNotifier<List<RecipeModel>> {
         ingredients: ingredients,
       );
       ref.invalidateSelf();
+      return recipe;
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
       rethrow;
