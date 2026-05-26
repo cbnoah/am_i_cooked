@@ -1,4 +1,5 @@
 import 'package:am_i_cooked/models/picture_model.dart';
+import 'package:am_i_cooked/models/ingredient_model.dart';
 
 class RecipeModel {
   int? id;
@@ -13,6 +14,7 @@ class RecipeModel {
   DateTime? createdAt;
   DateTime? updatedAt;
   PictureModel? recipePicture;
+  List<IngredientModel>? ingredients;
 
   String get displayName => name ?? 'Nom Indisponible';
 
@@ -29,6 +31,7 @@ class RecipeModel {
     this.createdAt,
     this.updatedAt,
     this.recipePicture,
+    this.ingredients,
   });
 
   RecipeModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +48,11 @@ class RecipeModel {
     updatedAt = _parseDate(json['updated_at']);
     if (json['recipe_picture'] != null) {
       recipePicture = PictureModel.fromJson(json['recipe_picture']);
+    }
+    if (json['ingredients'] != null) {
+      ingredients = (json['ingredients'] as List)
+          .map((i) => IngredientModel.fromJson(i))
+          .toList();
     }
   }
 
@@ -63,6 +71,9 @@ class RecipeModel {
     data['updated_at'] = updatedAt?.toIso8601String();
     if (recipePicture != null) {
       data['recipe_picture'] = recipePicture!.toJson();
+    }
+    if (ingredients != null) {
+      data['ingredients'] = ingredients!.map((i) => i.toJson()).toList();
     }
     return data;
   }
