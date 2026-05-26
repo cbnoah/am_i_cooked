@@ -9,7 +9,9 @@ class RecipeService {
   final Dio _dio = Dio();
 
   RecipeService() {
-    _dio.options.connectTimeout = const Duration(seconds: ApiConfig.connectTimeout);
+    _dio.options.connectTimeout = const Duration(
+      seconds: ApiConfig.connectTimeout,
+    );
   }
 
   Future<Options> _getOptions() async {
@@ -102,6 +104,24 @@ class RecipeService {
     } catch (e) {
       if (kDebugMode) {
         print('Error updating recipe: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> deleteFullRecipe(int id) async {
+    try {
+      final response = await _dio.delete(
+        ApiConfig.getRecipeUrl(id),
+        options: await _getOptions(),
+      );
+
+      if (response.statusCode! < 200 && response.statusCode! >= 300) {
+        throw Exception('Failed to delete recipe: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting recipe : $e');
       }
       rethrow;
     }
