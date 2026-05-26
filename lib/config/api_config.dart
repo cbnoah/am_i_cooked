@@ -31,8 +31,6 @@ class ApiConfig {
   static String getSpecificFavoriteUrl(int userId, int recipeId) => "$baseUrl/favorites/users/$userId/recipes/$recipeId";
 
   // Endpoints - Full recipes
-  static String getFullRecipeUrl(int recipeId) => "${getRecipeUrl(recipeId)}/full";
   static String createFullRecipeUrl()           => "$baseUrl/recipes/full";
   static String updateFullRecipeUrl(int recipeId) => "${getRecipeUrl(recipeId)}/full";
-  static String deleteFullRecipeUrl(int recipeId) => "${getRecipeUrl(recipeId)}/full";
 }
