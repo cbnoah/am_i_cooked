@@ -1,6 +1,7 @@
 class ApiConfig {
   // Server URL
   static const String baseUrl = String.fromEnvironment("API_URL");
+
   
   // Timeouts (en secondes)
   static const int connectTimeout = 15;
