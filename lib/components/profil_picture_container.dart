@@ -4,7 +4,7 @@ import 'package:flutter_m3shapes/flutter_m3shapes.dart';
 
 class ProfilePictureContainer extends StatelessWidget {
   static const String _pathPlaceHolderImage =
-      "https://i.redd.it/jqop4dqqmdx91.jpg";
+      "assets/image/logo.png";
   final String? pathImage;
   final Uint8List? imageBlob;
   final bool isEditIconVisible;
@@ -22,7 +22,7 @@ class ProfilePictureContainer extends StatelessWidget {
     if (imageBlob != null && imageBlob!.isNotEmpty) {
       return MemoryImage(imageBlob!);
     }
-    return const NetworkImage(_pathPlaceHolderImage);
+    return const AssetImage(_pathPlaceHolderImage);
   }
 
   @override
