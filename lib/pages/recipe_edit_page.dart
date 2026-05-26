@@ -1,10 +1,14 @@
+import 'dart:io';
 import 'package:am_i_cooked/models/ingredient_model.dart';
+import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:am_i_cooked/providers/favorites_provider.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
+import 'package:am_i_cooked/utils/http_helper.dart';
 import 'package:am_i_cooked/utils/snack_bar_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RecipeEditPage extends ConsumerStatefulWidget {
   final int? id;
@@ -22,10 +26,14 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
   TextEditingController cookingTimeController = TextEditingController();
   TextEditingController preparationTimeController = TextEditingController();
   String? difficulty;
-  
+
   List<IngredientModel> ingredientsList = [];
 
   bool isLoading = false;
+
+  Uint8List? _currentImageBlob;
+  String? _pendingImagePath;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -37,14 +45,78 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
           setState(() {
             titleController.text = recipeData.name ?? '';
             descriptionController.text = recipeData.description ?? '';
-            cookingTimeController.text = recipeData.cookingTime?.toString() ?? '';
-            preparationTimeController.text = recipeData.preparationTime?.toString() ?? '';
+            cookingTimeController.text =
+                recipeData.cookingTime?.toString() ?? '';
+            preparationTimeController.text =
+                recipeData.preparationTime?.toString() ?? '';
             difficulty = recipeData.difficulty;
+            _currentImageBlob = recipeData.recipePicture?.imgBlob;
             // Note: In a real app, we'd fetch ingredients for this recipe here
           });
         }
       });
     }
+  }
+
+  Future<void> _pickImage() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galerie'),
+              onTap: () async {
+                Navigator.pop(context);
+                final image = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 80,
+                  maxWidth: 512,
+                );
+                if (image != null) {
+                  try {
+                    final file = File(image.path);
+                    final bytes = await file.readAsBytes();
+                    setState(() {
+                      _currentImageBlob = bytes;
+                      _pendingImagePath = image.path;
+                    });
+                  } catch (e) {
+                    debugPrint('Error reading selected image: $e');
+                  }
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Caméra'),
+              onTap: () async {
+                Navigator.pop(context);
+                final image = await _picker.pickImage(
+                  source: ImageSource.camera,
+                  imageQuality: 80,
+                  maxWidth: 512,
+                );
+                if (image != null) {
+                  try {
+                    final file = File(image.path);
+                    final bytes = await file.readAsBytes();
+                    setState(() {
+                      _currentImageBlob = bytes;
+                      _pendingImagePath = image.path;
+                    });
+                  } catch (e) {
+                    debugPrint('Error reading selected image: $e');
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _addIngredient() {
@@ -55,7 +127,7 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
 
   Future<void> _saveRecipe() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (ingredientsList.isEmpty) {
       showErrorSnackbar("Veuillez ajouter au moins un ingrédient", context);
       return;
@@ -65,33 +137,55 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
 
     try {
       final userIdAsync = await ref.read(userIdProvider.future);
-      
+      RecipeModel? savedRecipe;
+
       if (widget.id == null) {
-        await ref.read(recipesProvider.notifier).createRecipe(
-          name: titleController.text,
-          description: descriptionController.text,
-          cookingTime: int.tryParse(cookingTimeController.text),
-          preparationTime: int.tryParse(preparationTimeController.text),
-          difficulty: difficulty,
-          idUser: userIdAsync,
-          ingredients: ingredientsList,
-        );
-        if (mounted) showSuccessSnackbar("Recette créée avec succès !", context);
+        savedRecipe = await ref
+            .read(recipesProvider.notifier)
+            .createRecipe(
+              name: titleController.text,
+              description: descriptionController.text,
+              cookingTime: int.tryParse(cookingTimeController.text),
+              preparationTime: int.tryParse(preparationTimeController.text),
+              difficulty: difficulty,
+              idUser: userIdAsync,
+              ingredients: ingredientsList,
+            );
+        if (mounted) {
+          showSuccessSnackbar("Recette créée avec succès !", context);
+        }
       } else {
-        await ref.read(recipesProvider.notifier).updateRecipe(
-          id: widget.id!,
-          name: titleController.text,
-          description: descriptionController.text,
-          cookingTime: int.tryParse(cookingTimeController.text),
-          preparationTime: int.tryParse(preparationTimeController.text),
-          difficulty: difficulty,
-          ingredients: ingredientsList,
-        );
-        if (mounted) showSuccessSnackbar("Recette mise à jour avec succès !", context);
+        savedRecipe = await ref
+            .read(recipesProvider.notifier)
+            .updateRecipe(
+              id: widget.id!,
+              name: titleController.text,
+              description: descriptionController.text,
+              cookingTime: int.tryParse(cookingTimeController.text),
+              preparationTime: int.tryParse(preparationTimeController.text),
+              difficulty: difficulty,
+              ingredients: ingredientsList,
+            );
+        if (mounted) {
+          showSuccessSnackbar("Recette mise à jour avec succès !", context);
+        }
       }
+
+      if (savedRecipe.id != null && _pendingImagePath != null) {
+        if (mounted) {
+          await HttpHelper.uploadRecipeImage(
+            savedRecipe.id!,
+            _pendingImagePath!,
+            context: context,
+            isMounted: () => mounted,
+          );
+        }
+      }
+
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted) showErrorSnackbar("Erreur lors de l'enregistrement : $e", context);
+      if (mounted)
+        showErrorSnackbar("Erreur lors de l'enregistrement : $e", context);
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -111,20 +205,33 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
               children: [
                 Stack(
                   children: [
-                    Container(
-                      height: MediaQuery.sizeOf(context).height / 4,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {},
+                    GestureDetector(
+                      onTap: isLoading ? null : _pickImage,
+                      child: Container(
+                        height: MediaQuery.sizeOf(context).height / 4,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: Theme.of(context).colorScheme.surface,
+                          image: _currentImageBlob != null
+                              ? DecorationImage(
+                                  image: MemoryImage(_currentImageBlob!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.photo_camera, size: 45.0),
+                              Icon(
+                                Icons.photo_camera,
+                                size: 45.0,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                               Text(
                                 widget.id == null
                                     ? "Ajouter une photo"
@@ -133,6 +240,9 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                                   fontFamily: "nunito",
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -147,7 +257,9 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.arrow_back),
                         style: IconButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
                         ),
                       ),
                     ),
@@ -165,14 +277,33 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                         spacing: 12.0,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildTextField("Titre de la recette", titleController, "Ex: Poulet rôti"),
-                          _buildTextField("Description", descriptionController, "Une délicieuse recette...", maxLines: 3),
-                          
+                          _buildTextField(
+                            "Titre de la recette",
+                            titleController,
+                            "Ex: Poulet rôti",
+                          ),
+                          _buildTextField(
+                            "Description",
+                            descriptionController,
+                            "Une délicieuse recette...",
+                            maxLines: 3,
+                          ),
+
                           Row(
                             children: [
-                              Expanded(child: _buildNumberField("Prép. (min)", preparationTimeController)),
+                              Expanded(
+                                child: _buildNumberField(
+                                  "Prép. (min)",
+                                  preparationTimeController,
+                                ),
+                              ),
                               const SizedBox(width: 10),
-                              Expanded(child: _buildNumberField("Cuisson (min)", cookingTimeController)),
+                              Expanded(
+                                child: _buildNumberField(
+                                  "Cuisson (min)",
+                                  cookingTimeController,
+                                ),
+                              ),
                             ],
                           ),
 
@@ -180,9 +311,15 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                           DropdownButtonFormField<String>(
                             initialValue: difficulty,
                             items: ["easy", "medium", "hard"]
-                                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                                .map(
+                                  (d) => DropdownMenuItem(
+                                    value: d,
+                                    child: Text(d),
+                                  ),
+                                )
                                 .toList(),
-                            onChanged: (val) => setState(() => difficulty = val),
+                            onChanged: (val) =>
+                                setState(() => difficulty = val),
                             decoration: _inputDecoration("Choisir"),
                           ),
 
@@ -208,14 +345,26 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary,
                               ),
                               onPressed: isLoading ? null : _saveRecipe,
-                              child: isLoading 
-                                ? const CircularProgressIndicator(color: Colors.white)
-                                : Text(widget.id == null ? "CRÉER LA RECETTE" : "METTRE À JOUR"),
+                              child: isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : Text(
+                                      widget.id == null
+                                          ? "CRÉER LA RECETTE"
+                                          : "METTRE À JOUR",
+                                    ),
                             ),
                           ),
                         ],
@@ -241,11 +390,19 @@ class _RecipeEditPageState extends ConsumerState<RecipeEditPage> {
     hintText: hint,
     filled: true,
     fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
   );
 
-  Widget _buildTextField(String label, TextEditingController controller, String hint, {int maxLines = 1}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    String hint, {
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
