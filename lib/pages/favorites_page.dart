@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:typed_data';
 
 import '../components/recipe_container.dart';
 import '../config/api_config.dart';
@@ -23,10 +25,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
     return '$prefix-${recipe.id ?? index}';
   }
 
-  String _imagePathFor(RecipeModel recipe) {
-    return recipe.idPicture != null
-        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
-        : _placeholderImageUrl;
+  Uint8List? _imagePathFor(RecipeModel recipe) {
+    print(recipe.idPicture);
+    return recipe.recipePicture?.imgBlob;
   }
 
   List<SizedBox?> _buildCarouselChildren(
@@ -48,7 +49,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           height: 200,
           child: RecipeContainer(
             key: ValueKey(heroTag),
-            path: imagePath,
+            blobImage: imagePath,
             isBookmarked: bookmarks.contains(recipe.id),
             showBookmarkIcon: true,
             recipeTitle: recipe.displayName,
@@ -95,7 +96,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Favorites',
+          'Favoris',
           style: TextStyle(
             fontFamily: "bbh_sans_hegarty",
             color: Theme.of(context).colorScheme.onSurface,
@@ -122,14 +123,22 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           final bookmarksAsync = ref.watch(bookmarksProvider(userId));
           return recipesAsync.when(
             data: (recipes) {
-              print(recipes);
+              if (kDebugMode) {
+                print(recipes);
+              }
               return bookmarksAsync.when(
                 data: (bookmarks) {
-                  print('Bookmarks count: ${bookmarks.length}');
-                  print('Bookmarks IDs: $bookmarks');
+                  if (kDebugMode) {
+                    print('Bookmarks count: ${bookmarks.length}');
+                  }
+                  if (kDebugMode) {
+                    print('Bookmarks IDs: $bookmarks');
+                  }
                   return RefreshIndicator(
                     onRefresh: () async {
-                      print('Refreshing bookmarks...');
+                      if (kDebugMode) {
+                        print('Refreshing bookmarks...');
+                      }
                       try {
                         ref.invalidate(bookmarksProvider(userId));
 
@@ -137,9 +146,13 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
 
                         await Future.delayed(const Duration(milliseconds: 100));
 
-                        print('Bookmarks refresh completed');
+                        if (kDebugMode) {
+                          print('Bookmarks refresh completed');
+                        }
                       } catch (e) {
-                        print('Error refreshing bookmarks: $e');
+                        if (kDebugMode) {
+                          print('Error refreshing bookmarks: $e');
+                        }
                       }
                     },
                     child: Center(
@@ -202,8 +215,12 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                   );
                 },
                 error: (error, stackTrace) {
-                  print('Bookmarks error: $error');
-                  print('Bookmarks stack trace: $stackTrace');
+                  if (kDebugMode) {
+                    print('Bookmarks error: $error');
+                  }
+                  if (kDebugMode) {
+                    print('Bookmarks stack trace: $stackTrace');
+                  }
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -1,5 +1,6 @@
 import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../components/criteria_bar.dart';
 import '../components/recipe_details.dart';
 
@@ -74,6 +75,7 @@ class RecipesPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [IconButton(onPressed: () => context.push('/recipe/$id/edit'), icon: Icon(Icons.edit))],
       ),
       body: SingleChildScrollView(
         child: Column(
