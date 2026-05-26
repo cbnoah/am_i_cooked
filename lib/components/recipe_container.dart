@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
 class RecipeContainer extends StatefulWidget {
-  final String path;
+  final Uint8List? blobImage;
   final bool isBookmarked;
   final bool showBookmarkIcon;
   final String recipeTitle;
@@ -12,7 +13,7 @@ class RecipeContainer extends StatefulWidget {
 
   const RecipeContainer({
     super.key,
-    required this.path,
+    required this.blobImage,
     required this.isBookmarked,
     required this.showBookmarkIcon,
     required this.recipeTitle,
@@ -28,6 +29,7 @@ class RecipeContainer extends StatefulWidget {
 
 class _RecipeContainerState extends State<RecipeContainer> {
   late bool _isBookmarked;
+  final path = "assets/image/placeholder.png";
 
   @override
   void initState() {
@@ -45,6 +47,13 @@ class _RecipeContainerState extends State<RecipeContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget? imageRender = widget.blobImage == null
+        ? Image.asset(
+            path,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          )
+        : Image.memory(widget.blobImage!);
     return GestureDetector(
       onTap: widget.onTap,
       child: Hero(
@@ -59,11 +68,7 @@ class _RecipeContainerState extends State<RecipeContainer> {
             ) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(30),
-                child: Image.network(
-                  widget.path,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.center,
-                ),
+                child: imageRender,
               );
             },
         child: Container(
@@ -90,14 +95,7 @@ class _RecipeContainerState extends State<RecipeContainer> {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  ClipRRect(
-                    clipBehavior: Clip.hardEdge,
-                    child: Image.network(
-                      widget.path,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.center,
-                    ),
-                  ),
+                  ClipRRect(clipBehavior: Clip.hardEdge, child: imageRender),
                   if (!hideBottomBar)
                     Align(
                       alignment: Alignment.bottomCenter,
