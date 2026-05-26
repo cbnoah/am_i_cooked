@@ -90,13 +90,13 @@ class RecipeService {
         'ingredients': ingredients.map((i) => i.toJson()).toList(),
       };
 
-      final response = await _dio.put(
+      final response = await _dio.patch(
         ApiConfig.updateFullRecipeUrl(id),
         data: data,
         options: await _getOptions(),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
         return RecipeModel.fromJson(response.data);
       } else {
         throw Exception('Failed to update recipe: ${response.statusCode}');
