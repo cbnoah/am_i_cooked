@@ -48,12 +48,12 @@ class _RecipeContainerState extends State<RecipeContainer> {
   @override
   Widget build(BuildContext context) {
     final Widget? imageRender = widget.blobImage == null
-        ? Image.asset(
-            path,
+        ? Image.asset(path, fit: BoxFit.cover, alignment: Alignment.center)
+        : Image.memory(
+            widget.blobImage!,
             fit: BoxFit.cover,
             alignment: Alignment.center,
-          )
-        : Image.memory(widget.blobImage!);
+          );
     return GestureDetector(
       onTap: widget.onTap,
       child: Hero(
