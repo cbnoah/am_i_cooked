@@ -1,10 +1,11 @@
-import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:am_i_cooked/providers/favorites_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:typed_data';
 
 import '../utils/nav_bar_switcher.dart';
 import '../components/recipe_container.dart';
@@ -17,17 +18,12 @@ class MainPage extends ConsumerStatefulWidget {
 }
 
 class _MainPageState extends ConsumerState<MainPage> {
-  static const String _placeholderImageUrl =
-      'https://www.apero-bordeaux.fr/wp-content/uploads/2024/02/20240216_65cfa1ce1fa54-1024x683.jpg';
-
   String _heroTagFor(String prefix, RecipeModel recipe, int index) {
     return '$prefix-${recipe.id ?? index}';
   }
 
-  String _imagePathFor(RecipeModel recipe) {
-    return recipe.idPicture != null
-        ? ApiConfig.getRecipePictureUrl(recipe.idPicture!)
-        : _placeholderImageUrl;
+  Uint8List? _imagePathFor(RecipeModel recipe) {
+    return recipe.recipePicture?.imgBlob;
   }
 
   List<Widget> _buildCarouselChildren(
@@ -44,7 +40,7 @@ class _MainPageState extends ConsumerState<MainPage> {
 
       return RecipeContainer(
         key: ValueKey(heroTag),
-        path: imagePath,
+        blobImage: imagePath,
         isBookmarked: bookmarks.contains(recipe.id),
         showBookmarkIcon: true,
         recipeTitle: recipe.displayName,
@@ -52,12 +48,34 @@ class _MainPageState extends ConsumerState<MainPage> {
         heroTag: heroTag,
         onTap: () => context.push('/recipe/$index'),
         onBookmarkChanged: () async {
-          final bookmarkActions =
-              ref.read(bookmarkActionsProvider(userId));
+          final bookmarkActions = ref.read(bookmarkActionsProvider(userId));
           await bookmarkActions.toggleBookmark(recipe.id!);
         },
       );
     }).toList();
+  }
+
+  Future<void> onRefresh(int userId) async {
+    if (kDebugMode) {
+      print('Refreshing recipes and bookmarks...');
+    }
+    try {
+      ref.invalidate(recipesProvider);
+      ref.invalidate(bookmarksProvider(userId));
+
+      ref.read(recipesProvider);
+      ref.read(bookmarksProvider(userId));
+
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      if (kDebugMode) {
+        print('Refresh completed successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error during refresh: $e');
+      }
+    }
   }
 
   @override
@@ -94,32 +112,19 @@ class _MainPageState extends ConsumerState<MainPage> {
 
           final bookmarksAsync = ref.watch(bookmarksProvider(userId));
 
-           return recipesAsync.when(
-             data: (recipes) {
-               print('MainPage: Recipes loaded, count=${recipes.length}');
-               final recommendedCarousel = recipes.take(5).toList();
-               final trendsCarousel = recipes.take(5).toList();
+          return recipesAsync.when(
+            data: (recipes) {
+              print('MainPage: Recipes loaded, count=${recipes.length}');
+              final recommendedCarousel = recipes.take(5).toList();
+              final trendsCarousel = recipes.take(5).toList();
 
-                return bookmarksAsync.when(
-                  data: (bookmarks) {
-                    print('MainPage: Bookmarks loaded, count=${bookmarks.length}, ids=$bookmarks');
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        print('Refreshing recipes and bookmarks...');
-                        try {
-                          ref.invalidate(recipesProvider);
-                          ref.invalidate(bookmarksProvider(userId));
-
-                          ref.read(recipesProvider);
-                          ref.read(bookmarksProvider(userId));
-
-                          await Future.delayed(const Duration(milliseconds: 100));
-
-                          print('Refresh completed successfully');
-                        } catch (e) {
-                          print('Error during refresh: $e');
-                        }
-                      },
+              return bookmarksAsync.when(
+                data: (bookmarks) {
+                  print(
+                    'MainPage: Bookmarks loaded, count=${bookmarks.length}, ids=$bookmarks',
+                  );
+                  return RefreshIndicator(
+                    onRefresh: () => onRefresh(userId),
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       child: Padding(
@@ -183,9 +188,9 @@ class _MainPageState extends ConsumerState<MainPage> {
                                           fontWeight: FontWeight.w300,
                                           fontStyle: FontStyle.italic,
                                           fontSize: 20,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                         ),
                                       ),
                                     )
@@ -234,9 +239,9 @@ class _MainPageState extends ConsumerState<MainPage> {
                                           fontWeight: FontWeight.w300,
                                           fontStyle: FontStyle.italic,
                                           fontSize: 20,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                         ),
                                       ),
                                     )
@@ -259,8 +264,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                     ),
                   );
                 },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Center(
                   child: Text(
                     'Erreur lors du chargement des bookmarks',
@@ -274,14 +278,40 @@ class _MainPageState extends ConsumerState<MainPage> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(
-              child: Text(
-                'Impossible de charger les recettes : $error',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: Theme.of(context).colorScheme.onSurface,
+            error: (error, stackTrace) => RefreshIndicator(
+              onRefresh: () => onRefresh(userId),
+              child: Center(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    spacing: 5.0,
+                    children: [
+                      Text(
+                        'Impossible de charger les recettes',
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      FilledButton(
+                        onPressed: () => onRefresh(userId),
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(
+                            Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        child: Text(
+                          'Recharger la page',
+                          style: TextStyle(
+                            fontFamily: "Nunito",
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
