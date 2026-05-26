@@ -95,7 +95,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Favorites',
+          'Favoris',
           style: TextStyle(
             fontFamily: "bbh_sans_hegarty",
             color: Theme.of(context).colorScheme.onSurface,
