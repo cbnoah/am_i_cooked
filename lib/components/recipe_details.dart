@@ -62,8 +62,7 @@ class RecipeDetails extends StatelessWidget {
                       );
                     },
                     child: Text(
-                      'by $userNameComment',
-
+                      'by ${userNameComment[index]}',
                       ),
                     ),
                   leading: const Icon(Icons.comment),
@@ -89,6 +88,7 @@ class RecipeDetails extends StatelessWidget {
   final int cookTime;
   final int servings;
   final String difficulty;
+  final int? xp;
   final List<String> ingredient;
   final List<String> comment ;
   final List<String> userNameComment ;
@@ -103,6 +103,7 @@ class RecipeDetails extends StatelessWidget {
     required this.cookTime,
     required this.servings,
     required this.difficulty,
+    this.xp,
     required this.ingredient,
     required this.comment,
     required this.userNameComment
@@ -186,6 +187,19 @@ class RecipeDetails extends StatelessWidget {
                   color: Colors.green,
                 ),
               ),
+              if (xp != null) ...[
+                const Spacer(),
+                Icon(Icons.stars, size: 16, color: Colors.amber[700]),
+                const SizedBox(width: 4),
+                Text(
+                  '$xp XP',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber[700],
+                  ),
+                ),
+              ],
             ],
           ),
           SizedBox(height: 20),

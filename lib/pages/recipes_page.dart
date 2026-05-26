@@ -1,5 +1,6 @@
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
+import 'package:am_i_cooked/providers/comments_provider.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,10 +25,7 @@ class RecipesPage extends ConsumerStatefulWidget {
 
 class _RecipesPageState extends ConsumerState<RecipesPage> {
   final TextEditingController _commentController = TextEditingController();
-
-  // On initialise avec des listes vides pour n'utiliser que les données réelles
-  List<String> localComments = [];
-  List<String> localUserNames = [];
+  bool _isSending = false;
 
   @override
   void dispose() {
@@ -35,16 +33,27 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
     super.dispose();
   }
 
-  void _submitComment() {
-    if (_commentController.text.trim().isNotEmpty) {
-      setState(() {
-        localComments.add(_commentController.text.trim());
-        localUserNames.add("Moi");
-      });
-      _commentController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Commentaire envoyé !')),
-      );
+  Future<void> _submitComment(int recipeId) async {
+    final text = _commentController.text.trim();
+    if (text.isEmpty || _isSending) return;
+
+    setState(() => _isSending = true);
+
+    final success = await ref.read(commentServiceProvider).postComment(recipeId, text);
+
+    if (mounted) {
+      setState(() => _isSending = false);
+      if (success) {
+        _commentController.clear();
+        ref.invalidate(commentsProvider(recipeId));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Commentaire envoyé !')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur lors de l\'envoi')),
+        );
+      }
     }
   }
 
@@ -59,6 +68,9 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
         body: const Center(child: CircularProgressIndicator()),
       );
     }
+
+    final authorAsync = ref.watch(userByIdProvider(recipe.idUser ?? 0));
+    final commentsAsync = ref.watch(commentsProvider(recipe.id ?? 0));
 
     final String resolvedTitle = recipe.name ?? "Recette sans nom";
     final List<String> resolvedCriteria = [
@@ -106,15 +118,45 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
             const SizedBox(height: 8),
             RecipeDetails(
               recipeName: resolvedTitle,
-              author: "Utilisateur n°${recipe.idUser ?? '?'}",
+              author: authorAsync.when(
+                data: (user) => user.username ?? "Inconnu",
+                loading: () => "Chargement...",
+                error: (_, __) => "Utilisateur n°${recipe.idUser}",
+              ),
               prepTime: recipe.preparationTime ?? 0,
               cookTime: recipe.cookingTime ?? 0,
               servings: 1,
               difficulty: recipe.difficulty ?? "Non définie",
+              xp: recipe.xpWinnable,
               ingredient: resolvedIngredients,
-              comment: localComments,
-              userNameComment: localUserNames,
+              comment: commentsAsync.maybeWhen(
+                data: (list) => list.map((c) => c.content).toList(),
+                orElse: () => [],
+              ),
+              userNameComment: commentsAsync.maybeWhen(
+                data: (list) => list.map((c) => c.username ?? "Anonyme").toList(),
+                orElse: () => [],
+              ),
             ),
+
+            if (recipe.description != null && recipe.description!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Description / Instructions",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      recipe.description!,
+                      style: const TextStyle(fontSize: 16, height: 1.5),
+                    ),
+                  ],
+                ),
+              ),
 
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -131,6 +173,7 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
                       Expanded(
                         child: TextField(
                           controller: _commentController,
+                          enabled: !_isSending,
                           decoration: InputDecoration(
                             hintText: "Votre avis...",
                             border: OutlineInputBorder(
@@ -140,10 +183,12 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      IconButton.filled(
-                        onPressed: _submitComment,
-                        icon: const Icon(Icons.send),
-                      ),
+                      _isSending 
+                        ? const CircularProgressIndicator()
+                        : IconButton.filled(
+                            onPressed: () => _submitComment(recipe.id ?? 0),
+                            icon: const Icon(Icons.send),
+                          ),
                     ],
                   ),
                 ],
