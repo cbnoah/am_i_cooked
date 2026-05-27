@@ -9,6 +9,7 @@ import 'package:am_i_cooked/theme/dark_theme_data.dart';
 import 'package:am_i_cooked/theme/light_theme_data.dart';
 import 'package:am_i_cooked/utils/auth_layout.dart';
 import 'package:dio/dio.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +21,20 @@ void main() async {
   final dio = Dio();
   final authService = AuthService(dio);
   await authService.bootstrapSession();
+
+  final appLinks = AppLinks();
+
+  String initialLocation = '/';
+
+  final initialUri = await appLinks.getInitialLink();
+
+  if (initialUri != null &&
+      initialUri.scheme == 'amicooked' &&
+      initialUri.host == 'recipe' &&
+      initialUri.pathSegments.isNotEmpty) {
+    final recipeId = initialUri.pathSegments.first;
+    initialLocation = '/recipe/$recipeId';
+  }
 
   final router = GoRouter(
     routes: [
@@ -55,19 +70,30 @@ void main() async {
       GoRoute(path: '/new', builder: (context, state) => RecipeEditPage()),
       GoRoute(path: '/favorites', builder: (context, state) => FavoritesPage()),
     ],
-    initialLocation: '/',
+    initialLocation: initialLocation,
   );
+
+  appLinks.uriLinkStream.listen((uri) {
+    debugPrint('Deep link reçu : $uri');
+
+    if (uri.scheme == 'amicooked' &&
+        uri.host == 'recipe' &&
+        uri.pathSegments.isNotEmpty) {
+      final recipeId = uri.pathSegments.first;
+      router.go('/recipe/$recipeId');
+    }
+  });
+
   runApp(ProviderScope(child: AmICookedApp(router: router)));
 }
 
 class AmICookedApp extends StatelessWidget {
-  final GoRouter? router;
+  final GoRouter router;
 
-  const AmICookedApp({super.key, this.router});
+  const AmICookedApp({super.key, required this.router});
 
   @override
   Widget build(BuildContext context) {
-    WidgetsFlutterBinding.ensureInitialized();
     return AdaptiveTheme(
       initial: AdaptiveThemeMode.system,
       light: lightTheme,
