@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Image.asset(
-                    'assets/fonts/image/logo.png',
+                    'assets/image/logo.png',
                     fit: BoxFit.fill,
                   ),
                 ),

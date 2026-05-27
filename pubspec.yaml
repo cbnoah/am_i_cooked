@@ -71,7 +71,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/fonts/image/
+    - assets/image/
 
   fonts:
     - family: "bbh_sans_hegarty"

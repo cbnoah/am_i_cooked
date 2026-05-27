@@ -1,6 +1,7 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/pages/favorites_page.dart';
 import 'package:am_i_cooked/pages/profile_page.dart';
+import 'package:am_i_cooked/pages/recipe_edit_page.dart';
 import 'package:am_i_cooked/pages/recipes_page.dart';
 import 'package:am_i_cooked/pages/search_page.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
@@ -12,6 +13,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +47,13 @@ void main() async {
         },
       ),
       GoRoute(
+        path: '/recipe/:id/edit',
+        builder: (context, state) {
+          final idRecipe = state.pathParameters['id']!;
+          return RecipeEditPage(id: int.parse(idRecipe));
+        },
+      ),
+      GoRoute(
         path: '/profile/:id',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
@@ -58,11 +67,7 @@ void main() async {
         },
       ),
       GoRoute(path: '/search', builder: (context, state) => SearchPage()),
-      GoRoute(
-        path: '/new',
-        builder: (context, state) =>
-        const Scaffold(body: Center(child: Text('New Recipe Page'))),
-      ),
+      GoRoute(path: '/new', builder: (context, state) => RecipeEditPage()),
       GoRoute(path: '/favorites', builder: (context, state) => FavoritesPage()),
     ],
     initialLocation: initialLocation,
@@ -98,6 +103,7 @@ class AmICookedApp extends StatelessWidget {
         theme: light,
         darkTheme: dark,
         routerConfig: router,
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

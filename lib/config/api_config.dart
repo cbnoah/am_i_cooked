@@ -1,6 +1,7 @@
 class ApiConfig {
   // Server URL
   static const String baseUrl = String.fromEnvironment("API_URL");
+
   
   // Timeouts (en secondes)
   static const int connectTimeout = 15;
@@ -29,4 +30,8 @@ class ApiConfig {
   static String getFavoritesUrl() => "$baseUrl/favorites";
   static String getUserFavoritesUrl(int userId) => "$baseUrl/favorites/users/$userId";
   static String getSpecificFavoriteUrl(int userId, int recipeId) => "$baseUrl/favorites/users/$userId/recipes/$recipeId";
+
+  // Endpoints - Full recipes
+  static String createFullRecipeUrl()           => "$baseUrl/recipes/full";
+  static String updateFullRecipeUrl(int recipeId) => "${getRecipeUrl(recipeId)}/full";
 }

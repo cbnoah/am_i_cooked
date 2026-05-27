@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
-        android:label="am_i_cooked"
+        android:label="Am I Cooked ?"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
