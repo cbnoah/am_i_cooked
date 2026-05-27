@@ -1,10 +1,10 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:am_i_cooked/service/auth_service.dart';
-import 'package:am_i_cooked/utils/auth_layout.dart';
 import 'package:am_i_cooked/pages/password_page.dart';
 import 'package:am_i_cooked/pages/email_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -182,12 +182,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     if (!mounted) return;
 
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (_) => const AuthLayout(),
-                      ),
-                          (route) => false,
-                    );
+                    context.go('/');
 
                   }
               ),
