@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import '../components/criteria_bar.dart';
 import '../components/recipe_details.dart';
 
@@ -68,7 +69,7 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
     ];
 
     final List<String> resolvedIngredients =
-        (recipe.description == null || recipe.description!.isEmpty)
+    (recipe.description == null || recipe.description!.isEmpty)
         ? ['Aucun ingrédient renseigné']
         : recipe.description!.split(',').map((e) => e.trim()).toList();
 
@@ -76,10 +77,19 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
       appBar: AppBar(
         title: Text(resolvedTitle),
         actions: [
+          IconButton(onPressed: () =>
+              SharePlus.instance.share(
+                ShareParams(
+                  uri: Uri.parse(
+                    "amicooked://recipe/${recipe.id}",
+                  ),
+                ),
+              ), icon: Icon(Icons.share)),
           userIdAsync.when(
             data: (userId) {
               debugPrint(
-                'RecipesPage: Current User ID=$userId, Recipe Author ID=${recipe.idUser}',
+                'RecipesPage: Current User ID=$userId, Recipe Author ID=${recipe
+                    .idUser}',
               );
               Dio dio = Dio();
               AuthService authService = AuthService(dio);
@@ -123,22 +133,24 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
             Hero(
               tag: widget.heroTag,
               child:
-                  (recipe.recipePicture?.imgBlob != null &&
-                          recipe.recipePicture!.imgBlob!.isNotEmpty)
-                      ? Image.memory(
-                        recipe.recipePicture!.imgBlob!,
-                        height: 250,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => _buildImageError(),
-                      )
-                      : Image.network(
-                        ApiConfig.getRecipePictureUrl(recipe.id ?? 0),
-                        height: 250,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => _buildImageError(),
-                      ),
+              (recipe.recipePicture?.imgBlob != null &&
+                  recipe.recipePicture!.imgBlob!.isNotEmpty)
+                  ? Image.memory(
+                recipe.recipePicture!.imgBlob!,
+                height: 250,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildImageError(),
+              )
+                  : Image.network(
+                ApiConfig.getRecipePictureUrl(recipe.id ?? 0),
+                height: 250,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildImageError(),
+              ),
             ),
             const SizedBox(height: 16),
             RecipeCriteriaBar(criteria: resolvedCriteria),
