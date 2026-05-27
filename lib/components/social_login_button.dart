@@ -37,7 +37,7 @@ class SocialLoginButton extends StatelessWidget {
           children: [
             if (isGoogle) ...[
               Image.asset(
-                'assets/fonts/image/google_logo.png',
+                'assets/image/google_logo.png',
                 width: 22,
                 height: 22,
                 fit: BoxFit.contain,
@@ -56,7 +56,7 @@ class SocialLoginButton extends StatelessWidget {
 
             if (isApple) ...[
               Image.asset(
-                'assets/fonts/image/apple.png',
+                'assets/image/apple.png',
                 width: 20,
                 height: 20,
                 fit: BoxFit.contain,

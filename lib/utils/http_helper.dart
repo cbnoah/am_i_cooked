@@ -211,6 +211,31 @@ class HttpHelper {
     return true;
   }
 
+  /// Upload recipe picture as BLOB and return success status
+  static Future<bool> uploadRecipeImage(int recipeId,
+      String filePath, {
+        required BuildContext context,
+        required bool Function() isMounted,
+      }) async {
+    final multipartFile = await http.MultipartFile.fromPath(
+      'img_blob',
+      filePath,
+    );
+
+    final result = await safeMultipartPost<Map<String, dynamic>>(
+      ApiConfig.getRecipePictureUrl(recipeId),
+      [multipartFile],
+          (body) => jsonDecode(body) as Map<String, dynamic>,
+      context: context,
+      isMounted: isMounted,
+    );
+
+    if (!isMounted() || result == null) return false;
+
+    showSuccessSnackbar('Recipe image uploaded with success!', context);
+    return true;
+  }
+
   /// Save user profile (username, email)
   static Future<bool> saveUserProfile(int userId,
       String username, {
