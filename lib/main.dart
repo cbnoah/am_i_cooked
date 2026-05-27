@@ -76,6 +76,7 @@ class AmICookedApp extends StatelessWidget {
         theme: light,
         darkTheme: dark,
         routerConfig: router,
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
