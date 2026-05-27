@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Accès à la galerie pour choisir une photo de profil</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Accès à la caméra pour prendre une photo de profil</string>
+	<key>NSAppTransportSecurity</key>
+    <key>NSAllowsArbitraryLoads</key>
 </dict>
 </plist>
