@@ -1,3 +1,4 @@
+import 'package:am_i_cooked/models/user_model.dart';
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/models/ingredient_model.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
@@ -7,6 +8,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../service/token_service.dart';
+
+final userByIdProvider = FutureProvider.family<UserModel, int>((ref, userId) async {
+  final dio = Dio();
+  dio.options.headers['Content-Type'] = 'application/json';
+  dio.options.headers['access-token'] =
+      'Bearer ${await TokenService.instance.getAccessToken()}';
+
+  final response = await dio.get(ApiConfig.getUserUrl(userId));
+  if (response.statusCode == 200) {
+    return UserModel.fromJson(response.data);
+  } else {
+    throw Exception('Failed to load user');
+  }
+});
 
 final recipesProvider =
     AsyncNotifierProvider<RecipesNotifier, List<RecipeModel>>(
