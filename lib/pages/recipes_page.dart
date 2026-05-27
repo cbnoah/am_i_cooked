@@ -1,6 +1,5 @@
 import 'package:am_i_cooked/config/api_config.dart';
 import 'package:am_i_cooked/models/recipe_model.dart';
-import 'package:am_i_cooked/providers/comments_provider.dart';
 import 'package:am_i_cooked/providers/recipes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,39 +23,6 @@ class RecipesPage extends ConsumerStatefulWidget {
 }
 
 class _RecipesPageState extends ConsumerState<RecipesPage> {
-  final TextEditingController _commentController = TextEditingController();
-  bool _isSending = false;
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submitComment(int recipeId) async {
-    final text = _commentController.text.trim();
-    if (text.isEmpty || _isSending) return;
-
-    setState(() => _isSending = true);
-
-    final success = await ref.read(commentServiceProvider).postComment(recipeId, text);
-
-    if (mounted) {
-      setState(() => _isSending = false);
-      if (success) {
-        _commentController.clear();
-        ref.invalidate(commentsProvider(recipeId));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Commentaire envoyé !')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erreur lors de l\'envoi')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final recipeFromApi = ref.watch(recipeByIdProvider(widget.id));
@@ -70,7 +36,6 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
     }
 
     final authorAsync = ref.watch(userByIdProvider(recipe.idUser ?? 0));
-    final commentsAsync = ref.watch(commentsProvider(recipe.id ?? 0));
 
     final String resolvedTitle = recipe.name ?? "Recette sans nom";
     final List<String> resolvedCriteria = [
@@ -94,7 +59,6 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
             Hero(
               tag: widget.heroTag,
               child: Image.network(
-                // On utilise l'URL de l'API pour l'image
                 ApiConfig.getRecipePictureUrl(recipe.id ?? 0),
                 height: 250,
                 width: double.infinity,
@@ -121,22 +85,15 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
               author: authorAsync.when(
                 data: (user) => user.username ?? "Inconnu",
                 loading: () => "Chargement...",
-                error: (_, __) => "Utilisateur n°${recipe.idUser}",
+                error: (err, stack) => "Utilisateur n°${recipe.idUser}",
               ),
+              authorId: recipe.idUser,
               prepTime: recipe.preparationTime ?? 0,
               cookTime: recipe.cookingTime ?? 0,
               servings: 1,
               difficulty: recipe.difficulty ?? "Non définie",
               xp: recipe.xpWinnable,
               ingredient: resolvedIngredients,
-              comment: commentsAsync.maybeWhen(
-                data: (list) => list.map((c) => c.content).toList(),
-                orElse: () => [],
-              ),
-              userNameComment: commentsAsync.maybeWhen(
-                data: (list) => list.map((c) => c.username ?? "Anonyme").toList(),
-                orElse: () => [],
-              ),
             ),
 
             if (recipe.description != null && recipe.description!.isNotEmpty)
@@ -157,43 +114,6 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
                   ],
                 ),
               ),
-
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Commentaires",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _commentController,
-                          enabled: !_isSending,
-                          decoration: InputDecoration(
-                            hintText: "Votre avis...",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      _isSending 
-                        ? const CircularProgressIndicator()
-                        : IconButton.filled(
-                            onPressed: () => _submitComment(recipe.id ?? 0),
-                            icon: const Icon(Icons.send),
-                          ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 30),
           ],
         ),
