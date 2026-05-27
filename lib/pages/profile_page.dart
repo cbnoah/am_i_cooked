@@ -255,8 +255,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             onTap: () => SharePlus.instance.share(
                               ShareParams(
                                 uri: Uri.parse(
-                                  // TODO: need to change this url when deep link will be ready
-                                  "https://am-i-cooked.com/profile/${asyncSnapshot.data?.id}",
+                                  "amicooked://profile/${asyncSnapshot.data?.id}",
                                 ),
                               ),
                             ),
@@ -283,7 +282,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             ),
                           ),
                           // TODO: add role verification to only show this option to admins
-                          PopupMenuItem(
+                          /*PopupMenuItem(
                             child: Row(
                               spacing: 8.0,
                               children: [
@@ -305,7 +304,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ),
                               ],
                             ),
-                          ),
+                          ),*/
                         ];
                       },
                     );
