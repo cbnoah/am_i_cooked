@@ -27,6 +27,24 @@ class RecipesPage extends ConsumerStatefulWidget {
 }
 
 class _RecipesPageState extends ConsumerState<RecipesPage> {
+  Widget _buildImageError() {
+    return Container(
+      height: 250,
+      color: Colors.grey[200],
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.restaurant, size: 50, color: Colors.grey),
+          SizedBox(height: 8),
+          Text(
+            "Aucune image disponible",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final recipeFromApi = ref.watch(recipeByIdProvider(widget.id));
@@ -104,27 +122,23 @@ class _RecipesPageState extends ConsumerState<RecipesPage> {
           children: [
             Hero(
               tag: widget.heroTag,
-              child: Image.network(
-                ApiConfig.getRecipePictureUrl(recipe.id ?? 0),
-                height: 250,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 250,
-                  color: Colors.grey[200],
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.restaurant, size: 50, color: Colors.grey),
-                      SizedBox(height: 8),
-                      Text(
-                        "Aucune image disponible",
-                        style: TextStyle(color: Colors.grey),
+              child:
+                  (recipe.recipePicture?.imgBlob != null &&
+                          recipe.recipePicture!.imgBlob!.isNotEmpty)
+                      ? Image.memory(
+                        recipe.recipePicture!.imgBlob!,
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => _buildImageError(),
+                      )
+                      : Image.network(
+                        ApiConfig.getRecipePictureUrl(recipe.id ?? 0),
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => _buildImageError(),
                       ),
-                    ],
-                  ),
-                ),
-              ),
             ),
             const SizedBox(height: 16),
             RecipeCriteriaBar(criteria: resolvedCriteria),
